@@ -58,7 +58,6 @@ const config: HardhatUserConfig = {
   },
   namedAccounts: {
     deployer: 0,
-    relayer: 1,
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
