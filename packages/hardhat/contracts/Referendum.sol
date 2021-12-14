@@ -1,14 +1,14 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "./DemocracyToken.sol";
 
 interface IDemocracyToken {
     function mint(address _to) external;
 }
 
-contract Referendum is ERC721URIStorage, Ownable {
+contract Referendum is ERC721URIStorage {
+    address public owner;
     uint256 public totalMinted;
     uint256 public startTime;
     uint256 public endTime;
@@ -16,36 +16,39 @@ contract Referendum is ERC721URIStorage, Ownable {
     bool private isDemocracyTokenMinted;
     mapping(address => bool) private _isMinted;
 
-    constructor(uint256 _startime, uint256 _endTime)
+    constructor(uint256 startTime_, uint256 endTime_)
         ERC721("Referendum", "RNFT")
     {
-        startTime = _startime;
-        endTime = _endTime;
+        startTime = startTime_;
+        endTime = endTime_;
         democracyToken = IDemocracyToken(address(new DemocracyToken()));
+        owner = _msgSender();
     }
 
-    function mint(string calldata _tokenURI) external {
+    function mintTo(string calldata tokenURI_, address to_) public {
         require(
             block.timestamp >= startTime && block.timestamp <= endTime,
             "Mint time hasn't started or has ended"
         );
-        require(!_isMinted[_msgSender()], "Already minted");
-        _isMinted[_msgSender()] = true;
-        _mint(_msgSender(), totalMinted);
-        _setTokenURI(totalMinted, _tokenURI);
-        democracyToken.mint(_msgSender());
+        require(!_isMinted[to_], "Already minted");
+        _isMinted[to_] = true;
+        _mint(to_, totalMinted);
+        _setTokenURI(totalMinted, string(tokenURI_));
+        democracyToken.mint(to_);
         totalMinted++;
     }
 
-    function mintDemocracySpirityNFT(string calldata _tokenURI)
-        external
-        onlyOwner
-    {
+    function mint(string calldata tokenURI_) external {
+        mintTo(tokenURI_, _msgSender());
+    }
+
+    function mintDemocracySpirityNFT(string calldata tokenURI_) external {
+        require(owner == _msgSender(), "Only owner");
         require(block.timestamp >= endTime, "Mint time hasn't ended");
         require(!isDemocracyTokenMinted, "Already minted");
         isDemocracyTokenMinted = true;
         _mint(address(this), totalMinted);
-        _setTokenURI(totalMinted, _tokenURI);
+        _setTokenURI(totalMinted, tokenURI_);
         totalMinted++;
     }
 
