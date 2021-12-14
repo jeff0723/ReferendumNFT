@@ -1,6 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-import "./ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "./DemocracyToken.sol";
 
 interface IDemocracyToken {
@@ -16,41 +16,39 @@ contract Referendum is ERC721URIStorage {
     bool private isDemocracyTokenMinted;
     mapping(address => bool) private _isMinted;
 
-    constructor(
-        uint256 _startime,
-        uint256 _endTime,
-        address gasPayer
-    ) ERC721("Referendum", "RNFT") ERC2771Context(gasPayer) {
-        startTime = _startime;
-        endTime = _endTime;
+    constructor(uint256 startTime_, uint256 endTime_)
+        ERC721("Referendum", "RNFT")
+    {
+        startTime = startTime_;
+        endTime = endTime_;
         democracyToken = IDemocracyToken(address(new DemocracyToken()));
         owner = _msgSender();
     }
 
-    modifier checkMint() {
+    function mintTo(string calldata tokenURI_, address to_) public {
         require(
             block.timestamp >= startTime && block.timestamp <= endTime,
             "Mint time hasn't started or has ended"
         );
-        require(!_isMinted[_msgSender()], "Already minted");
-        _;
-    }
-
-    function mint(bytes calldata _tokenURI) external checkMint {
-        _isMinted[_msgSender()] = true;
-        _mint(_msgSender(), totalMinted);
-        _setTokenURI(totalMinted, string(_tokenURI));
-        democracyToken.mint(_msgSender());
+        require(!_isMinted[to_], "Already minted");
+        _isMinted[to_] = true;
+        _mint(to_, totalMinted);
+        _setTokenURI(totalMinted, string(tokenURI_));
+        democracyToken.mint(to_);
         totalMinted++;
     }
 
-    function mintDemocracySpirityNFT(string calldata _tokenURI) external {
+    function mint(string calldata tokenURI_) external {
+        mintTo(tokenURI_, _msgSender());
+    }
+
+    function mintDemocracySpirityNFT(string calldata tokenURI_) external {
         require(owner == _msgSender(), "Only owner");
         require(block.timestamp >= endTime, "Mint time hasn't ended");
         require(!isDemocracyTokenMinted, "Already minted");
         isDemocracyTokenMinted = true;
         _mint(address(this), totalMinted);
-        _setTokenURI(totalMinted, _tokenURI);
+        _setTokenURI(totalMinted, tokenURI_);
         totalMinted++;
     }
 

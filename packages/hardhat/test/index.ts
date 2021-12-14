@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { ethers, deployments } from "hardhat";
 import { Referendum__factory } from "../../react-app/src/typechain";
+
 describe("Referendum", function () {
   it("mint", async function () {
     // Accounts
@@ -14,7 +15,7 @@ describe("Referendum", function () {
       dev
     );
     console.log("Referendum contract address: ", referendumDeployment.address);
-    const tokenURI = "ipfs://";
+    const tokenURI = "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/6969";
     const tx = await referendumContract.mint(tokenURI);
     tx.wait();
     expect((await referendumContract.tokenURI(0)) === tokenURI);
