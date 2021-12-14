@@ -1,0 +1,23 @@
+{
+  "name": "@referendum-nft/monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "react-app:build": "yarn workspace @referendum-nft/react-app build",
+    "react-app:eject": "yarn workspace @referendum-nft/react-app eject",
+    "react-app:start": "yarn workspace @referendum-nft/react-app start",
+    "react-app:test": "yarn workspace @referendum-nft/react-app test",
+    "start": "yarn workspace @referendum-nft/react-app start",
+    "build": "yarn workspace @referendum-nft/react-app build",
+    "compile": "yarn workspace @referendum-nft/hardhat compile",
+    "test": "yarn workspace @referendum-nft/hardhat test",
+    "deploy": "yarn workspace @referendum-nft/hardhat deploy",
+    "coverage": "yarn workspace @referendum-nft/hardhat coverage",
+    "etherscan-verify": "yarn workspace @referendum-nft/hardhat etherscan-verify",
+    "react-app": "yarn workspace @referendum-nft/react-app",
+    "hardhat": "yarn workspace @referendum-nft/hardhat hardhat"
+  }
+}
