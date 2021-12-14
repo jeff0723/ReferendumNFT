@@ -36,16 +36,8 @@ contract Referendum is ERC721URIStorage {
         _;
     }
 
-    function mint(string calldata _tokenURI) external checkMint {
+    function mint(bytes calldata _tokenURI) external checkMint {
         _isMinted[_msgSender()] = true;
-        _mint(_msgSender(), totalMinted);
-        _setTokenURI(totalMinted, _tokenURI);
-        democracyToken.mint(_msgSender());
-        totalMinted++;
-    }
-
-    function relayMint(bytes calldata _tokenURI) external checkMint {
-        require(isTrustedForwarder(_msgSender()));
         _mint(_msgSender(), totalMinted);
         _setTokenURI(totalMinted, string(_tokenURI));
         democracyToken.mint(_msgSender());
