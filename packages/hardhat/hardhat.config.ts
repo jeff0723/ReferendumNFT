@@ -51,10 +51,10 @@ const config: HardhatUserConfig = {
     },
   },
   typechain: {
-    outDir: "../react-app/src/typechain",
+    outDir: "../frontend/src/typechain",
   },
   paths: {
-    deployments: "../react-app/src/deployments",
+    deployments: "../frontend/src/deployments",
   },
   namedAccounts: {
     deployer: 0,
