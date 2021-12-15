@@ -72,10 +72,13 @@ function App() {
     console.log("CID: ", cid);
 
   }
+  const handleFinish = (values: any) => {
+    console.log("Success: ", values)
+  }
   console.log("imageURI: ", imageURI)
   return (
-    <Layout style={{ height: "100vh", overflow: "auto", backgroundColor: "#ffffff" }}>
-      <Header style={styles.header}>
+    <Layout style={{ height: "100vh", backgroundColor: "#ffffff" }}>
+      <Header style={{ ...styles.header, position: 'fixed', zIndex: 1, width: '100%' }}>
         <div>
           <Text style={{ color: '#1890ff', fontSize: '16px', fontWeight: 'bold' }}>Referendum</Text>
         </div>
@@ -85,7 +88,7 @@ function App() {
 
         </div>
       </Header>
-      <Content style={{ display: 'flex', flexDirection: 'row', padding: '16px', flexWrap: 'wrap' }}>
+      <Content style={{ display: 'flex', flexDirection: 'row', marginTop: '32px', padding: '16px', flexWrap: 'wrap' }}>
         <div style={styles.contentBox}>
           <div>
             <Text style={styles.title}>紀念你的重要時刻</Text>
@@ -95,25 +98,28 @@ function App() {
         </div>
         <div style={styles.contentBox}>
           <Card
+            title={<Text>創建公投NFT</Text>}
             style={{
               padding: '16px',
-              width: '50%'
+              width: '50%',
+              minWidth: '375px'
             }}>
             <Form
               form={form}
               layout="vertical"
               size={'large'}
+              onFinish={handleFinish}
             >
-              <Form.Item label="名字" required tooltip="為您的專屬時刻起的名字吧">
+              <Form.Item name='name' label="名字" required tooltip="為您的專屬時刻起的名字吧">
                 <Input placeholder="input placeholder" />
               </Form.Item>
-              <Form.Item label="你的心情" required tooltip="紀錄你當下的心情">
+              <Form.Item name='description' label="你的心情" required tooltip="紀錄你當下的心情">
                 <Input placeholder="input placeholder" />
               </Form.Item>
               <Form.Item label="你的時刻" required tooltip="上傳一張照片紀念這個時刻">
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <input type="file" id="actual-btn" hidden onChange={handleUploadChange} />
-                  <label htmlFor="actual-btn">{imageStatus !== ImageStatus.Uploaded ? uploadButton : <img src={previewURL} alt='preview' height='100%' width="100%" />}</label>
+                  <label htmlFor="actual-btn">{imageStatus !== ImageStatus.Uploaded ? uploadButton : <img src={previewURL} alt='preview' height='100%' width="100%" style={{ maxHeight: '200px', maxWidth: '200px' }} />}</label>
                 </div>
               </Form.Item>
               <div style={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
