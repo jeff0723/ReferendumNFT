@@ -97,7 +97,7 @@ const Account = (props: Props) => {
                     </div>
                 </Box>
             </Modal>
-        </div>
+        </div >
     )
 }
 
