@@ -8,7 +8,7 @@ import Chains from './components/Chains';
 import { useActiveWeb3React } from './hooks/web3';
 import { useMediaQuery } from 'react-responsive'
 import { useReferendumContract } from './hooks/useContract'
-
+import metadataTemplate from './metadata-template.json'
 import "./style.css";
 enum ImageStatus {
   NotUpload,
@@ -48,7 +48,10 @@ const styles = {
   }
 }
 
-
+const addImageOptions = {
+  pin: true,
+  enableShardingExperiment: true,
+}
 const client = create({ url: 'https://ipfs.infura.io:5001/api/v0' })
 
 function App() {
@@ -76,10 +79,6 @@ function App() {
   );
   const handleUploadChange = async (e: any) => {
     console.log("any: ", e.target.files[0]);
-    const addImageOptions = {
-      pin: true,
-      enableShardingExperiment: true,
-    }
     setImageStatus(ImageStatus.Uploading)
     const cid = await client.add(e.target.files[0], addImageOptions)
       .then(response => {
@@ -91,9 +90,19 @@ function App() {
     console.log("CID: ", cid);
 
   }
-  const handleFinish = (values: any) => {
+  const handleFinish = async (values: any) => {
     console.log("Success: ", values)
-
+    let template = metadataTemplate
+    const isGasFree = values.gasfree
+    console.log("start to submit");
+    template.name = values.name
+    template.description = values.description
+    template.image = imageURI
+    const cid = await client.add(JSON.stringify(template), addImageOptions)
+      .then(response => {
+        return response.cid.toString()
+      })
+    console.log("cid: ", cid);
   }
   console.log("imageURI: ", imageURI)
   return (
@@ -179,9 +188,9 @@ function App() {
                       </div>
                     </Form.Item>
                     <Form.Item name="gasfree" valuePropName="checked" >
-                      <Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>
-                        <Checkbox >免Gas Fee鑄造</Checkbox>
-                      </Tooltip>
+                      <Checkbox value={true}>免Gas Fee鑄造</Checkbox>
+                      {/* <Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>
+                      </Tooltip> */}
                     </Form.Item>
                     <div style={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
                       <Button type="primary" htmlType="submit" style={{ borderRadius: '16px', width: '100%' }}>
