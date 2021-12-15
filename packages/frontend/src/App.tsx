@@ -41,12 +41,10 @@ const styles = {
     minWidth: '375px'
   },
   title: {
-    fontSize: '48px',
     color: '#40a9ff',
     fontWeight: 'bold'
   },
   subtitle: {
-    fontSize: '16px',
     color: '#bfbfbf'
   }
 }
@@ -62,6 +60,9 @@ function App() {
   const [imageStatus, setImageStatus] = useState(ImageStatus.NotUpload);
   const [finish, setFinish] = useState(PageStatus.Edit);
   const isDesktop = useMediaQuery({
+    query: '(min-width: 576px)'
+  })
+  const isTablet = useMediaQuery({
     query: '(min-width: 992px)'
   })
   console.log("App: ", chainId)
@@ -106,15 +107,15 @@ function App() {
 
         </div>
       </Header>
-      <Content style={{ minHeight: 'calc(100vh - 48px)' }}>
+      <Content style={{ minHeight: 'calc(100vh - 48px)', marginBottom: (!isTablet ? "32px" : '0px') }}>
         <Row style={{ minHeight: 'calc(100vh - 48px)' }}>
           <Col span={24} lg={12} >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', minHeight: '60vh' }}>
               <div>
-                <Text style={styles.title}>紀念你的重要時刻</Text>
+                <Text style={{ ...styles.title, fontSize: (isDesktop ? "48px" : '32px') }}>紀念你的重要時刻</Text>
               </div>
               <div>
-                <Text style={styles.subtitle}>#Vote For NFT</Text>
+                <Text style={{ ...styles.subtitle, fontSize: (isDesktop ? "16px" : '12px') }}>#Vote For NFT</Text>
                 <Text style={{ ...styles.subtitle, marginLeft: "5px" }}>#Democracy Token</Text>
               </div>
 
