@@ -14,7 +14,8 @@ export enum SupportedChainId {
     ARBITRUM_RINKEBY = 421611,
     OPTIMISM = 10,
     OPTIMISTIC_KOVAN = 69,
-    MUMBAI = 80001
+    MUMBAI = 80001,
+    HARDHAT = 1337,
   }
   export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
     SupportedChainId.MAINNET,
@@ -28,6 +29,7 @@ export enum SupportedChainId {
     SupportedChainId.OPTIMISM,
     SupportedChainId.OPTIMISTIC_KOVAN,
     SupportedChainId.MUMBAI,
+    SupportedChainId.HARDHAT,
   ]
 const NETWORK_URLS: { [key in SupportedChainId]: string } = {
     [SupportedChainId.MAINNET]: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
@@ -39,7 +41,8 @@ const NETWORK_URLS: { [key in SupportedChainId]: string } = {
     [SupportedChainId.OPTIMISTIC_KOVAN]: `https://optimism-kovan.infura.io/v3/${INFURA_KEY}`,
     [SupportedChainId.ARBITRUM_ONE]: `https://arbitrum-mainnet.infura.io/v3/${INFURA_KEY}`,
     [SupportedChainId.ARBITRUM_RINKEBY]: `https://arbitrum-rinkeby.infura.io/v3/${INFURA_KEY}`,
-    [SupportedChainId.MUMBAI]: "https://polygon-mumbai.g.alchemy.com/v2/YeWNsmNZnmrXElTepCA6Js4GG7bt366I"
+    [SupportedChainId.MUMBAI]: "https://polygon-mumbai.g.alchemy.com/v2/YeWNsmNZnmrXElTepCA6Js4GG7bt366I",
+    [SupportedChainId.HARDHAT]: "http://127.0.0.1:8545",
 }
 
 export const injected = new InjectedConnector({

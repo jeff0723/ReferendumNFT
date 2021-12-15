@@ -21,10 +21,10 @@ export const networkConfigs = {
       blockExplorerUrl: "https://goerli.etherscan.io/",
     },
     "0x539": {
-      chainName: "Local Chain",
+      chainName: "Hardhat",
       currencyName: "ETH",
       currencySymbol: "ETH",
-      rpcUrl: "http://127.0.0.1:7545",
+      rpcUrl: "http://127.0.0.1:8545",
     },
     "0xa86a": {
       chainId: 43114,

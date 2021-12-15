@@ -44,6 +44,12 @@ const menuItems = [
         key: "0x13881",
         value: "Mumbai",
         icon: <PolygonLogo />,
+    },
+    {
+        id: 1337,
+        key: "0x539",
+        value: "Hardhat",
+        icon: <PolygonLogo />,
     }
 ];
 const Chains = (props: Props) => {
