@@ -1,5 +1,5 @@
-import { LoadingOutlined, PlusOutlined, MenuOutlined } from '@ant-design/icons';
-import { Card, Form, Input, Layout, Typography, Button, Checkbox, Tooltip, Col, Row, Divider, Drawer } from 'antd';
+import { LoadingOutlined, PlusOutlined, MenuOutlined, FacebookFilled, InstagramFilled, TwitterSquareFilled } from '@ant-design/icons';
+import { Card, Form, Input, Layout, Typography, Button, Checkbox, Tooltip, Col, Row, Divider, Drawer, Spin, Result } from 'antd';
 import "antd/dist/antd.css";
 import { create } from 'ipfs-http-client';
 import React, { useState } from 'react';
@@ -9,6 +9,8 @@ import { useActiveWeb3React } from './hooks/web3';
 import { useMediaQuery } from 'react-responsive'
 import { useReferendumContract } from './hooks/useContract'
 import metadataTemplate from './metadata-template.json'
+import { FacebookShareButton, TwitterShareButton, InstapaperShareButton } from "react-share";
+import InstagramImage from './images/instagram.png'
 import "./style.css";
 enum ImageStatus {
   NotUpload,
@@ -60,7 +62,7 @@ function App() {
   const [imageURI, setImageURI] = useState<string>("");
   const [previewURL, setPreviewURL] = useState<string>("")
   const [imageStatus, setImageStatus] = useState(ImageStatus.NotUpload);
-  const [finish, setFinish] = useState(PageStatus.Edit);
+  const [mintStatus, setMintStatus] = useState(PageStatus.Edit);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const referendumContract = useReferendumContract();
   const isDesktop = useMediaQuery({
@@ -98,8 +100,10 @@ function App() {
     template.name = values.name
     template.description = values.description
     template.image = imageURI
+    setMintStatus(PageStatus.Uploading)
     const cid = await client.add(JSON.stringify(template), addImageOptions)
       .then(response => {
+        setMintStatus(PageStatus.Finished)
         return response.cid.toString()
       })
     console.log("cid: ", cid);
@@ -159,49 +163,77 @@ function App() {
           {!isTablet ? <Divider style={{ marginBottom: '32px' }} /> : <></>}
           <Col span={24} lg={12}>
             <div style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              {!finish ?
-                <Card
-                  style={{
-                    borderRadius: '16px',
-                    padding: '16px',
-                    width: '50%',
-                    minWidth: '330px',
-                    boxShadow: (isTablet ? "0 1px 10px rgb(151 164 175 / 30%)" : ""),
-                    border: (!isTablet ? "none" : "")
-                  }}>
-                  <Form
-                    form={form}
-                    layout="vertical"
-                    size={'large'}
-                    onFinish={handleFinish}
-                  >
-                    <Form.Item name='name' label="名字" required tooltip="為您的專屬時刻起的名字吧">
-                      <Input placeholder="input placeholder" />
-                    </Form.Item>
-                    <Form.Item name='description' label="你的心情" required tooltip="紀錄你當下的心情">
-                      <Input placeholder="input placeholder" />
-                    </Form.Item>
-                    <Form.Item label="你的時刻" required tooltip="上傳一張照片紀念這個時刻">
-                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <input type="file" id="actual-btn" hidden onChange={handleUploadChange} />
-                        <label htmlFor="actual-btn">{imageStatus !== ImageStatus.Uploaded ? uploadButton : <img src={previewURL} alt='preview' height='100%' width="100%" style={{ maxHeight: '200px', maxWidth: '200px' }} />}</label>
-                      </div>
-                    </Form.Item>
-                    <Form.Item name="gasfree" valuePropName="checked" >
-                      <Checkbox value={true}>免Gas Fee鑄造</Checkbox>
-                      {/* <Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>
+              <Card
+                style={{
+                  borderRadius: '16px',
+                  padding: '16px',
+                  width: '50%',
+                  minWidth: '330px',
+                  boxShadow: (isTablet ? "0 1px 10px rgb(151 164 175 / 30%)" : ""),
+                  border: (!isTablet ? "none" : "")
+                }}>
+                {mintStatus !== PageStatus.Finished ?
+                  <Spin spinning={mintStatus === PageStatus.Uploading} tip='鑄造中...'>
+                    <Form
+                      form={form}
+                      layout="vertical"
+                      size={'large'}
+                      onFinish={handleFinish}
+                    >
+                      <Form.Item name='name' label="名字" required tooltip="為您的專屬時刻起的名字吧">
+                        <Input placeholder="input placeholder" />
+                      </Form.Item>
+                      <Form.Item name='description' label="你的心情" required tooltip="紀錄你當下的心情">
+                        <Input placeholder="input placeholder" />
+                      </Form.Item>
+                      <Form.Item label="你的時刻" required tooltip="上傳一張照片紀念這個時刻">
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                          <input type="file" id="actual-btn" hidden onChange={handleUploadChange} />
+                          <label htmlFor="actual-btn">{imageStatus !== ImageStatus.Uploaded ? uploadButton : <img src={previewURL} alt='preview' height='100%' width="100%" style={{ maxHeight: '200px', maxWidth: '200px' }} />}</label>
+                        </div>
+                      </Form.Item>
+                      <Form.Item name="gasfree" valuePropName="checked" >
+                        <Checkbox value={true}>免Gas Fee鑄造</Checkbox>
+                        {/* <Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>
                       </Tooltip> */}
-                    </Form.Item>
-                    <div style={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
-                      <Button type="primary" htmlType="submit" style={{ borderRadius: '16px', width: '100%' }}>
-                        鑄造
-                      </Button>
-                    </div>
-
-                  </Form>
-                </Card> :
-                <Card></Card>
-              }
+                      </Form.Item>
+                      <div style={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
+                        <Button type="primary" htmlType="submit" style={{ borderRadius: '16px', width: '100%' }}>
+                          鑄造
+                        </Button>
+                      </div>
+                    </Form>
+                  </Spin> :
+                  <div>
+                    <Result
+                      status="success"
+                      title="你已經成功鑄造您的公投NFT!"
+                      subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
+                      extra={[
+                        <FacebookShareButton
+                          url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
+                          quote={"我已成功創建公投NFT(Referendum NFT #1244"}
+                          hashtag={"#VoteForNFT"}
+                        >
+                          <FacebookFilled style={{ color: '#4267B2' }} /> 分享到Facebook
+                        </FacebookShareButton>,
+                        <InstapaperShareButton
+                          url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
+                          title={"我已成功創建公投NFT(Referendum NFT #1244"}
+                          description={""}>
+                          <img src={InstagramImage} alt='ig' height='14px' width='14px' /> 分享到Instagram
+                        </InstapaperShareButton>,
+                        <TwitterShareButton
+                          url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
+                          title={"我已成功創建公投NFT(Referendum NFT #1244"}
+                          hashtags={["VoteForNFT", "DemocracyToken"]}>
+                          <TwitterSquareFilled style={{ color: '#00acee' }} /> 分享到Twitter
+                        </TwitterShareButton>,
+                      ]}
+                    />
+                  </div>
+                }
+              </Card>
             </div>
           </Col>
         </Row>
