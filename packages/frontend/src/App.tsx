@@ -2,7 +2,7 @@ import { LoadingOutlined, PlusOutlined, MenuOutlined, FacebookFilled, InstagramF
 import { Card, Form, Input, Layout, Typography, Button, Checkbox, Tooltip, Col, Row, Divider, Drawer, Spin, Result } from 'antd';
 import "antd/dist/antd.css";
 import { create } from 'ipfs-http-client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Account from './components/Account';
 import Chains from './components/Chains';
 import { useActiveWeb3React } from './hooks/web3';
@@ -10,8 +10,10 @@ import { useMediaQuery } from 'react-responsive'
 import { useReferendumContract } from './hooks/useContract'
 import metadataTemplate from './metadata-template.json'
 import { FacebookShareButton, TwitterShareButton, InstapaperShareButton } from "react-share";
-import InstagramImage from './images/instagram.png'
 import "./style.css";
+import { BigNumber, ethers, Wallet } from 'ethers';
+import { removeAllListeners } from 'process';
+
 enum ImageStatus {
   NotUpload,
   Uploading,
@@ -23,6 +25,7 @@ enum PageStatus {
   Uploading,
   Finished
 }
+const FEE_PAYER_KEY = process.env.REACT_APP_FEE_PAYER;
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography
 const styles = {
@@ -57,14 +60,26 @@ const addImageOptions = {
 const client = create({ url: 'https://ipfs.infura.io:5001/api/v0' })
 
 function App() {
-  const { chainId } = useActiveWeb3React();
+  const { chainId, account } = useActiveWeb3React();
   const [form] = Form.useForm();
   const [imageURI, setImageURI] = useState<string>("");
   const [previewURL, setPreviewURL] = useState<string>("")
   const [imageStatus, setImageStatus] = useState(ImageStatus.NotUpload);
   const [mintStatus, setMintStatus] = useState(PageStatus.Edit);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [feePayerBalance, setFeePayerBalance] = useState<string>("");
   const referendumContract = useReferendumContract();
+  useEffect(() => {
+    const fetchFeePayerBalance = async () => {
+      if (referendumContract && FEE_PAYER_KEY) {
+        const feePayer = new Wallet(FEE_PAYER_KEY, referendumContract.provider);
+        const balance = await referendumContract.provider.getBalance(feePayer.address);
+        setFeePayerBalance(ethers.utils.formatEther(balance));
+      }
+    }
+    fetchFeePayerBalance();
+  }, [referendumContract]);
+  console.log(feePayerBalance)
   const isDesktop = useMediaQuery({
     query: '(min-width: 576px)'
   })
@@ -93,18 +108,34 @@ function App() {
 
   }
   const handleFinish = async (values: any) => {
-    console.log("Success: ", values)
-    let template = metadataTemplate
-    const isGasFree = values.gasfree
+    if (!account || !referendumContract) {
+      console.log("account:", account);
+      console.log("contract:", referendumContract);
+      return;
+    }
+    console.log("Success: ", values);
+    let template = metadataTemplate;
+    const isGasFree = values.gasfree;
     console.log("start to submit");
-    template.name = values.name
-    template.description = values.description
-    template.image = imageURI
-    setMintStatus(PageStatus.Uploading)
+    template.name = values.name;
+    template.description = values.description;
+    template.image = imageURI;
+    setMintStatus(PageStatus.Uploading);
     const cid = await client.add(JSON.stringify(template), addImageOptions)
       .then(response => {
-        setMintStatus(PageStatus.Finished)
-        return response.cid.toString()
+        if (isGasFree && FEE_PAYER_KEY) {
+          const feePayer = new Wallet(FEE_PAYER_KEY, referendumContract.provider);
+          referendumContract.connect(feePayer).mintTo(response.cid.toString(), account);
+        }
+        else if (!isGasFree) {
+          referendumContract.mint(response.cid.toString());
+        }
+        else {
+          console.log("fee payer", FEE_PAYER_KEY);
+        }
+        return response.cid.toString();
+      }).finally(() => {
+        setMintStatus(PageStatus.Finished);
       })
     console.log("cid: ", cid);
   }
@@ -217,12 +248,6 @@ function App() {
                         >
                           <FacebookFilled style={{ color: '#4267B2' }} /> 分享到Facebook
                         </FacebookShareButton>,
-                        <InstapaperShareButton
-                          url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
-                          title={"我已成功創建公投NFT(Referendum NFT #1244"}
-                          description={""}>
-                          <img src={InstagramImage} alt='ig' height='14px' width='14px' /> 分享到Instagram
-                        </InstapaperShareButton>,
                         <TwitterShareButton
                           url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
                           title={"我已成功創建公投NFT(Referendum NFT #1244"}
@@ -234,11 +259,11 @@ function App() {
                   </div>
                 }
               </Card>
-            </div>
-          </Col>
-        </Row>
+            </div >
+          </Col >
+        </Row >
 
-      </Content>
+      </Content >
       <Footer>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Text>Powered by © RebirthLab</Text>
