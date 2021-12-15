@@ -1,14 +1,13 @@
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { Card, Form, Input, Layout, Typography, Button, Checkbox, Tooltip, Col, Row } from 'antd';
+import { LoadingOutlined, PlusOutlined, MenuOutlined } from '@ant-design/icons';
+import { Card, Form, Input, Layout, Typography, Button, Checkbox, Tooltip, Col, Row, Divider, Drawer } from 'antd';
 import "antd/dist/antd.css";
 import { create } from 'ipfs-http-client';
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import Account from './components/Account';
 import Chains from './components/Chains';
 import { useActiveWeb3React } from './hooks/web3';
 import { useMediaQuery } from 'react-responsive'
-
+import { useReferendumContract } from './hooks/useContract'
 
 import "./style.css";
 enum ImageStatus {
@@ -29,7 +28,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    background: "linear-gradient(270deg, rgba(255,255,255,1) 0%, rgba(24,178,255,1)  100%)",
+    background: "linear-gradient(270deg, #eef8fa 0%, rgba(24,178,255,1)  100%)",
     color: '#ffffff',
     // border: "1px solid #e7eaf3"
   },
@@ -59,6 +58,8 @@ function App() {
   const [previewURL, setPreviewURL] = useState<string>("")
   const [imageStatus, setImageStatus] = useState(ImageStatus.NotUpload);
   const [finish, setFinish] = useState(PageStatus.Edit);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const referendumContract = useReferendumContract();
   const isDesktop = useMediaQuery({
     query: '(min-width: 576px)'
   })
@@ -102,10 +103,35 @@ function App() {
           <Text style={{ color: '#ffffff', fontSize: '16px', fontWeight: 'bold' }}>Referendum</Text>
         </div>
         <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-          <Chains />
-          <Account />
+          {isTablet ?
+            <>
+              <Chains />
+              <Account />
+            </> :
+            <div onClick={() => { setDrawerOpen(true) }}>
+              <MenuOutlined style={{ color: '#40a9ff' }} />
+            </div>
+          }
 
         </div>
+        <Drawer
+          title="設定"
+          closable={true}
+          placement='left'
+          onClose={() => { setDrawerOpen(false) }}
+          visible={drawerOpen}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'center', alignItems: 'center' }}>
+            <div>
+              <Text>網路</Text>
+              <Chains />
+            </div>
+            <div>
+              <Text>帳號</Text>
+              <Account />
+            </div>
+          </div>
+        </Drawer>
       </Header>
       <Content style={{ minHeight: 'calc(100vh - 48px)', marginBottom: (!isTablet ? "32px" : '0px') }}>
         <Row style={{ minHeight: 'calc(100vh - 48px)' }}>
@@ -116,21 +142,23 @@ function App() {
               </div>
               <div>
                 <Text style={{ ...styles.subtitle, fontSize: (isDesktop ? "16px" : '12px') }}>#Vote For NFT</Text>
-                <Text style={{ ...styles.subtitle, marginLeft: "5px" }}>#Democracy Token</Text>
+                <Text style={{ ...styles.subtitle, marginLeft: "5px", fontSize: (isDesktop ? "16px" : '12px') }}>#Democracy Token</Text>
               </div>
 
             </div>
           </Col>
+          {!isTablet ? <Divider style={{ marginBottom: '32px' }} /> : <></>}
           <Col span={24} lg={12}>
             <div style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               {!finish ?
                 <Card
-                  // title={<Text>創建公投NFT</Text>}
                   style={{
                     borderRadius: '16px',
                     padding: '16px',
                     width: '50%',
-                    minWidth: '330px'
+                    minWidth: '330px',
+                    boxShadow: (isTablet ? "0 1px 10px rgb(151 164 175 / 30%)" : ""),
+                    border: (!isTablet ? "none" : "")
                   }}>
                   <Form
                     form={form}
@@ -171,7 +199,9 @@ function App() {
 
       </Content>
       <Footer>
-
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Text>Powered by © RebirthLab</Text>
+        </div>
       </Footer>
     </Layout >
   );

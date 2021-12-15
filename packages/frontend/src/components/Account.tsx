@@ -6,6 +6,8 @@ import MetaMaskIcon from '../images/metamask.png';
 import WalletConnectIcon from '../images/walletConnectIcon.svg';
 import { useActiveWeb3React } from '../hooks/web3';
 import { getEllipsisTxt } from '../helpers/formatters'
+import { useMediaQuery } from 'react-responsive'
+
 declare let window: any;
 
 interface Props {
@@ -47,12 +49,19 @@ const Box = styled('div')`
 const Account = (props: Props) => {
     const { activate, account } = useActiveWeb3React()
     const [isModalOpen, setModalOpen] = useState(false);
+    const isTablet = useMediaQuery({
+        query: '(min-width: 992px)'
+    })
     if (account) {
-        return <Button style={styles.button}>{getEllipsisTxt(account)}</Button>
+        return (
+            <div>
+                <Button style={{ ...styles.button, border: (isTablet ? "none" : "") }}>{getEllipsisTxt(account)}</Button>
+            </div>
+        )
     }
     return (
         <div>
-            <Button style={styles.button} onClick={() => { setModalOpen(true) }}>連接錢包</Button>
+            <Button style={{ ...styles.button, border: (isTablet ? "none" : "") }} onClick={() => { setModalOpen(true) }}>連接錢包</Button>
             <Modal
                 title="連接錢包"
                 style={styles.modal}

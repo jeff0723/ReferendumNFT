@@ -4,6 +4,7 @@ import { Menu, Dropdown, Button } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import useChain from "../../hooks/useChain";
 import { useActiveWeb3React } from '../../hooks/web3'
+import { useMediaQuery } from 'react-responsive'
 
 interface Props {
 
@@ -27,6 +28,7 @@ const styles = {
     },
     button: {
         borderRadius: "12px",
+        border: 'none'
     },
 };
 
@@ -48,6 +50,9 @@ const Chains = (props: Props) => {
     const { chainId, library } = useActiveWeb3React()
     const { switchNetwork } = useChain();
     const [selected, setSelected] = useState<Chain>();
+    const isTablet = useMediaQuery({
+        query: '(min-width: 992px)'
+    })
     const handleMenuClick = (e: any) => {
         console.log("switch to: ", e.key);
         switchNetwork(e.key);
@@ -79,9 +84,9 @@ const Chains = (props: Props) => {
                 <Button
                     key={selected?.key}
                     icon={selected?.icon}
-                    style={{ ...styles.button, ...styles.item }}
+                    style={{ ...styles.button, ...styles.item, border: (isTablet ? "none" : "") }}
                 >
-                    <span style={{ marginLeft: "5px" }}>{selected ? selected?.value : "新增網路"}</span>
+                    <span style={{ marginLeft: "5px" }}>{selected ? selected?.value : "切換網路"}</span>
                     <DownOutlined />
                 </Button>
             </Dropdown>
