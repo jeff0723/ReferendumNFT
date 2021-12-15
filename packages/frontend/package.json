@@ -1,5 +1,5 @@
 {
-  "name": "@referendum-nft/react-app",
+  "name": "@referendum-nft/frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -16,6 +16,7 @@
     "@web3-react/walletconnect-connector": "^6.2.8",
     "antd": "^4.17.3",
     "ethers": "^5.5.2",
+    "ipfs-http-client": "^54.0.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
