@@ -1,5 +1,5 @@
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { Card, Form, Input, Layout, Typography, Button } from 'antd';
+import { Card, Form, Input, Layout, Typography, Button, Checkbox, Tooltip } from 'antd';
 import "antd/dist/antd.css";
 import { create } from 'ipfs-http-client';
 import React, { useState } from 'react';
@@ -74,6 +74,7 @@ function App() {
   }
   const handleFinish = (values: any) => {
     console.log("Success: ", values)
+    console.log('form: ', form)
   }
   console.log("imageURI: ", imageURI)
   return (
@@ -94,12 +95,15 @@ function App() {
             <Text style={styles.title}>紀念你的重要時刻</Text>
             <br />
             <Text style={styles.subtitle}>#Vote For NFT</Text>
+            <Text style={{ ...styles.subtitle, marginLeft: "5px" }}>#Democracy Token</Text>
+
           </div>
         </div>
         <div style={styles.contentBox}>
           <Card
-            title={<Text>創建公投NFT</Text>}
+            // title={<Text>創建公投NFT</Text>}
             style={{
+              borderRadius: '16px',
               padding: '16px',
               width: '50%',
               minWidth: '375px'
@@ -122,12 +126,14 @@ function App() {
                   <label htmlFor="actual-btn">{imageStatus !== ImageStatus.Uploaded ? uploadButton : <img src={previewURL} alt='preview' height='100%' width="100%" style={{ maxHeight: '200px', maxWidth: '200px' }} />}</label>
                 </div>
               </Form.Item>
+              <Form.Item name="gasfree" valuePropName="checked" >
+                <Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>
+                  <Checkbox >免Gas Fee鑄造</Checkbox>
+                </Tooltip>
+              </Form.Item>
               <div style={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
-                <Button type="primary" htmlType="submit" style={{ borderRadius: '16px' }}>
+                <Button type="primary" htmlType="submit" style={{ borderRadius: '16px', width: '100%' }}>
                   鑄造
-                </Button>
-                <Button htmlType="button" style={{ borderRadius: '16px', color: "#40a9ff" }}>
-                  免Gas鑄造
                 </Button>
               </div>
 
