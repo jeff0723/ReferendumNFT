@@ -2,18 +2,25 @@
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract DemocracyToken is ERC20("Democracy", "DOM") {
-    address private masterContract;
+/**
+ @title Democracy Token (fractional token for Democracy Spirit NFT)
+ @author Jeffrey Lin
+ */
+contract DemocracyToken is ERC20("DemocracyToken", "DOM") {
+    /// @notice Address of ReferendumNFT contract
+    address public referendumNFTAddress;
 
+    /// @dev Set address
     constructor() {
-        masterContract = _msgSender();
+        referendumNFTAddress = _msgSender();
     }
 
-    function mint(address _to) external {
+    /// @dev Only mint by ReferendumNFT contract
+    function mint(address _to, uint256 _amount) external {
         require(
-            _msgSender() == masterContract,
+            _msgSender() == referendumNFTAddress,
             "Only master contract can mint"
         );
-        _mint(_to, 1);
+        _mint(_to, _amount);
     }
 }
