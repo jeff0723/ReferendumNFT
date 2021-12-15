@@ -11,6 +11,9 @@
 # production
 /build
 
+# deployment
+src/deployments/localhost
+
 # misc
 .DS_Store
 .env
