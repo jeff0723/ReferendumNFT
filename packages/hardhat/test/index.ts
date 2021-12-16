@@ -1,6 +1,7 @@
 import { expect } from "chai";
+//@ts-ignore
 import { ethers, deployments } from "hardhat";
-import { Referendum__factory } from "../../react-app/src/typechain";
+import { Referendum__factory } from "../../frontend/src/typechain";
 
 describe("Referendum", function () {
   it("mint", async function () {

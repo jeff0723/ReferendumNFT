@@ -1,4 +1,4 @@
-import { LoadingOutlined, PlusOutlined, MenuOutlined, FacebookFilled, InstagramFilled, TwitterSquareFilled } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined, MenuOutlined, FacebookFilled, TwitterSquareFilled } from '@ant-design/icons';
 import { Card, Form, Input, Layout, Typography, Button, Checkbox, Tooltip, Col, Row, Divider, Drawer, Spin, Result } from 'antd';
 import "antd/dist/antd.css";
 import { create } from 'ipfs-http-client';
@@ -9,9 +9,9 @@ import { useActiveWeb3React } from './hooks/web3';
 import { useMediaQuery } from 'react-responsive'
 import { useReferendumContract } from './hooks/useContract'
 import metadataTemplate from './metadata-template.json'
-import { FacebookShareButton, TwitterShareButton, InstapaperShareButton } from "react-share";
+import { FacebookShareButton, TwitterShareButton } from "react-share";
 import "./style.css";
-import { BigNumber, ethers, Wallet } from 'ethers';
+import { BigNumber, ContractReceipt, ethers, Wallet } from 'ethers';
 import { removeAllListeners } from 'process';
 
 enum ImageStatus {
@@ -23,9 +23,11 @@ enum ImageStatus {
 enum PageStatus {
   Edit,
   Uploading,
-  Finished
+  Finished,
+  Error
 }
-const FEE_PAYER_KEY = process.env.REACT_APP_FEE_PAYER;
+// const FEE_PAYER_KEY = process.env.REACT_APP_FEE_PAYER;
+const FEE_PAYER_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography
 const styles = {
@@ -67,19 +69,23 @@ function App() {
   const [imageStatus, setImageStatus] = useState(ImageStatus.NotUpload);
   const [mintStatus, setMintStatus] = useState(PageStatus.Edit);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [feePayer, setFeePayer] = useState<Wallet>();
   const [feePayerBalance, setFeePayerBalance] = useState<string>("");
+  const [tokenId, setTokenId] = useState<BigNumber>();
   const referendumContract = useReferendumContract();
   useEffect(() => {
+    if (referendumContract && FEE_PAYER_KEY) {
+      setFeePayer(new Wallet(FEE_PAYER_KEY, referendumContract.provider));
+    }
+  }, [referendumContract]);
+  useEffect(() => {
     const fetchFeePayerBalance = async () => {
-      if (referendumContract && FEE_PAYER_KEY) {
-        const feePayer = new Wallet(FEE_PAYER_KEY, referendumContract.provider);
-        const balance = await referendumContract.provider.getBalance(feePayer.address);
-        setFeePayerBalance(ethers.utils.formatEther(balance));
+      if (feePayer) {
+        setFeePayerBalance(ethers.utils.formatEther(await feePayer.getBalance()));
       }
     }
     fetchFeePayerBalance();
-  }, [referendumContract]);
-  console.log(feePayerBalance)
+  }, [feePayer]);
   const isDesktop = useMediaQuery({
     query: '(min-width: 576px)'
   })
@@ -107,6 +113,24 @@ function App() {
     console.log("CID: ", cid);
 
   }
+  const handleReceipt = (receipt: ContractReceipt) => {
+    if (receipt.status === 0) {
+      console.log("PageError");
+      setMintStatus(PageStatus.Error);
+      return;
+    }
+    // console.log("receipt:", receipt.events);
+    if (receipt.events && receipt.events[0].args) {
+      const tokenId = receipt.events[0].args[2];
+      setTokenId(tokenId);
+      console.log("tokenId:", tokenId);
+      if (tokenId) {
+        setTokenId(tokenId);
+      }
+      setMintStatus(PageStatus.Finished);
+    }
+  }
+
   const handleFinish = async (values: any) => {
     if (!account || !referendumContract) {
       console.log("account:", account);
@@ -122,20 +146,22 @@ function App() {
     template.image = imageURI;
     setMintStatus(PageStatus.Uploading);
     const cid = await client.add(JSON.stringify(template), addImageOptions)
-      .then(response => {
-        if (isGasFree && FEE_PAYER_KEY) {
-          const feePayer = new Wallet(FEE_PAYER_KEY, referendumContract.provider);
-          referendumContract.connect(feePayer).mintTo(response.cid.toString(), account);
-        }
-        else if (!isGasFree) {
-          referendumContract.mint(response.cid.toString());
-        }
-        else {
-          console.log("fee payer", FEE_PAYER_KEY);
+      .then(async (response) => {
+        try {
+          if (isGasFree) {
+            if (!feePayer) return;
+            const tx = await referendumContract.connect(feePayer).mintTo(response.cid.toString(), account, { gasPrice: "100000000000" });
+            handleReceipt(await tx.wait());
+          }
+          else {
+            const tx = await referendumContract.mint(response.cid.toString());
+            handleReceipt(await tx.wait());
+          }
+        } catch (err: any) {
+          alert(err.data ? err.data.message : err.message);
+          setMintStatus(PageStatus.Error);
         }
         return response.cid.toString();
-      }).finally(() => {
-        setMintStatus(PageStatus.Finished);
       })
     console.log("cid: ", cid);
   }
@@ -224,7 +250,7 @@ function App() {
                         </div>
                       </Form.Item>
                       <Form.Item name="gasfree" valuePropName="checked" >
-                        <Checkbox value={true}>免Gas Fee鑄造</Checkbox>
+                        <Checkbox value={true}>{`免Gas Fee鑄造(${feePayerBalance})`}</Checkbox>
                         {/* <Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>
                       </Tooltip> */}
                       </Form.Item>
@@ -239,18 +265,19 @@ function App() {
                     <Result
                       status="success"
                       title="你已經成功鑄造您的公投NFT!"
-                      subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
+                      // subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
+                      subTitle={`Token ID: ${tokenId?.toString()}`}
                       extra={[
                         <FacebookShareButton
                           url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
-                          quote={"我已成功創建公投NFT(Referendum NFT #1244"}
+                          quote={`我已成功創建公投NFT(Referendum NFT #${tokenId?.toString()}`}
                           hashtag={"#VoteForNFT"}
                         >
                           <FacebookFilled style={{ color: '#4267B2' }} /> 分享到Facebook
                         </FacebookShareButton>,
                         <TwitterShareButton
                           url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
-                          title={"我已成功創建公投NFT(Referendum NFT #1244"}
+                          title={`我已成功創建公投NFT(Referendum NFT #${tokenId?.toString()}`}
                           hashtags={["VoteForNFT", "DemocracyToken"]}>
                           <TwitterSquareFilled style={{ color: '#00acee' }} /> 分享到Twitter
                         </TwitterShareButton>,
