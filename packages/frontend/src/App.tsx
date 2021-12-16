@@ -333,14 +333,14 @@ function App() {
                         <Text>IPFS URL: <a href={`https://ipfs.io/ipfs/${metadataCID}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://ipfs.io/ipfs/${metadataCID}`)}</a></Text></div>}
                       extra={[
                         <FacebookShareButton
-                          url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
+                          url={"https://www.referendum-nft.com/"}
                           quote={`我已成功鑄造公投NFT(Referendum NFT) #${tokenId?.toString()}`}
                           hashtag={"#iVoted"}
                         >
                           <FacebookFilled style={{ color: '#4267B2' }} /> 分享到Facebook
                         </FacebookShareButton>,
                         <TwitterShareButton
-                          url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
+                          url={"https://www.referendum-nft.com/"}
                           title={`我已成功鑄造公投NFT(Referendum NFT) #${tokenId?.toString()}`}
                           hashtags={["VoteForNFT", "DemocracyToken", "iVoted"]}>
                           <TwitterSquareFilled style={{ color: '#00acee' }} /> 分享到Twitter
