@@ -283,14 +283,14 @@ function App() {
                       extra={[
                         <FacebookShareButton
                           url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
-                          quote={`我已成功創建公投NFT(Referendum NFT #${tokenId?.toString()}`}
+                          quote={`我已成功鑄造公投NFT(Referendum NFT #${tokenId?.toString()}`}
                           hashtag={"#VoteForNFT"}
                         >
                           <FacebookFilled style={{ color: '#4267B2' }} /> 分享到Facebook
                         </FacebookShareButton>,
                         <TwitterShareButton
                           url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
-                          title={`我已成功創建公投NFT(Referendum NFT #${tokenId?.toString()}`}
+                          title={`我已成功鑄造公投NFT(Referendum NFT #${tokenId?.toString()}`}
                           hashtags={["VoteForNFT", "DemocracyToken"]}>
                           <TwitterSquareFilled style={{ color: '#00acee' }} /> 分享到Twitter
                         </TwitterShareButton>,
