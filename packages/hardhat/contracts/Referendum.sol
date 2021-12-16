@@ -48,14 +48,14 @@ contract Referendum is ERC721URIStorage {
         _isMinted[to_] = true;
         _safeMint(to_, totalSupply);
         _setTokenURI(totalSupply, string(tokenURI_));
-        democracyToken.mint(to_, 1);
+        democracyToken.mint(to_, 1e18);
         totalSupply++;
     }
 
     /// @notice Mint NFT for self
     function mint(string calldata tokenURI_) external {
         mintTo(tokenURI_, _msgSender());
-        democracyToken.mint(_msgSender(), 1);
+        democracyToken.mint(_msgSender(), 1e18);
     }
 
     /// @dev Mint Democracy Spirit NFT (only owner)

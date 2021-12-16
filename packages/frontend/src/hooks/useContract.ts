@@ -1,9 +1,9 @@
 import { Contract } from '@ethersproject/contracts'
-import { Referendum, Referendum__factory} from '../typechain'
+import { DemocracyToken, DemocracyToken__factory, Referendum, Referendum__factory} from '../typechain'
 import { useMemo } from 'react'
 import { useWeb3React } from '@web3-react/core';
 import { getContract } from '../utils/getContract'
-import { REFERENDUM_ADDRESS } from '../constants/address';
+import { REFERENDUM_NFT_ADDRESS, DEMOCRACY_TOKEN_ADDRESS } from '../constants/address';
 export function useContract<T extends Contract = Contract>(
     addressOrAddressMap: string | { [chainId: number]: string } | undefined,
     ABI: any,
@@ -27,5 +27,9 @@ export function useContract<T extends Contract = Contract>(
 }
 
 export function useReferendumContract() {
-    return useContract<Referendum>(REFERENDUM_ADDRESS, Referendum__factory.abi, true)
+    return useContract<Referendum>(REFERENDUM_NFT_ADDRESS, Referendum__factory.abi, true);
+}
+
+export function useDemocracyToken() {
+    return useContract<DemocracyToken>(DEMOCRACY_TOKEN_ADDRESS, DemocracyToken__factory.abi, true);
 }

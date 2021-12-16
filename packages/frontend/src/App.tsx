@@ -7,7 +7,7 @@ import Account from './components/Account';
 import Chains from './components/Chains';
 import { useActiveWeb3React } from './hooks/web3';
 import { useMediaQuery } from 'react-responsive'
-import { useReferendumContract } from './hooks/useContract'
+import { useDemocracyToken, useReferendumContract } from './hooks/useContract'
 import metadataTemplate from './metadata-template.json'
 import { FacebookShareButton, TwitterShareButton } from "react-share";
 import "./style.css";
@@ -29,8 +29,8 @@ enum PageStatus {
   Finished,
   Error
 }
-// const FEE_PAYER_KEY = process.env.REACT_APP_FEE_PAYER;
-const FEE_PAYER_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+const FEE_PAYER_KEY = process.env.REACT_APP_FEE_PAYER;
+// const FEE_PAYER_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography
 const styles = {
@@ -78,11 +78,15 @@ function App() {
   const [feePayerBalance, setFeePayerBalance] = useState<string>("");
   const [tokenId, setTokenId] = useState<BigNumber>();
   const referendumContract = useReferendumContract();
+  const democracyToken = useDemocracyToken();
+  const [tokenSupply, setTokenSupply] = useState<string>("");
+
   useEffect(() => {
     if (referendumContract && FEE_PAYER_KEY) {
       setFeePayer(new Wallet(FEE_PAYER_KEY, referendumContract.provider));
     }
   }, [referendumContract]);
+
   useEffect(() => {
     const fetchFeePayerBalance = async () => {
       if (feePayer) {
@@ -92,6 +96,14 @@ function App() {
     fetchFeePayerBalance();
   }, [feePayer]);
 
+  useEffect(() => {
+    const fetchTokenSupply = async () => {
+      if (democracyToken)
+        setTokenSupply(ethers.utils.formatEther(await democracyToken.totalSupply()));
+    }
+    fetchTokenSupply();
+  }, [democracyToken]);
+  console.log(tokenSupply)
   const isDesktop = useMediaQuery({
     query: '(min-width: 576px)'
   })
