@@ -16,7 +16,6 @@ import { openNotificationWithIcon } from './helpers/notification'
 import { BLOCKEXPLORER_URL } from './constants/blockExplorer'
 import { getEllipsisTxt } from './helpers/formatters'
 
-
 enum ImageStatus {
   NotUpload,
   Uploading,
@@ -80,11 +79,18 @@ function App() {
   const referendumContract = useReferendumContract();
   const democracyToken = useDemocracyToken();
   const [tokenSupply, setTokenSupply] = useState<string>("");
+  const [nftSupply, setNftSupply] = useState<string>("");
 
   useEffect(() => {
-    if (referendumContract && FEE_PAYER_KEY) {
-      setFeePayer(new Wallet(FEE_PAYER_KEY, referendumContract.provider));
+    const fetchNftSupply = async () => {
+      if (referendumContract) {
+        if (FEE_PAYER_KEY) {
+          setFeePayer(new Wallet(FEE_PAYER_KEY, referendumContract.provider));
+        }
+        setNftSupply((await referendumContract.totalSupply()).toString());
+      }
     }
+    fetchNftSupply();
   }, [referendumContract]);
 
   useEffect(() => {
@@ -248,8 +254,8 @@ function App() {
 
               </div>
               <div>
-                <span style={{ backgroundColor: "#fff0f6", color: '#ff85c0', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>公投NFT發行量: </span>
-                <span style={{ marginLeft: "16px", backgroundColor: "#e6f7ff", color: '#40a9ff', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>民主代幣發行量: </span>
+                <span style={{ backgroundColor: "#fff0f6", color: '#ff85c0', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>{`公投NFT發行量: ${nftSupply}`} </span>
+                <span style={{ marginLeft: "16px", backgroundColor: "#e6f7ff", color: '#40a9ff', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>{`民主代幣發行量: ${parseInt(tokenSupply).toFixed(2)}`} </span>
 
               </div>
             </div>
