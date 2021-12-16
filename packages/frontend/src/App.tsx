@@ -15,6 +15,7 @@ import { BigNumber, ContractReceipt, ethers, Wallet } from 'ethers';
 import { openNotificationWithIcon } from './helpers/notification'
 import { BLOCKEXPLORER_URL } from './constants/blockExplorer'
 import { getEllipsisTxt } from './helpers/formatters'
+import { REFERENDUM_NFT_ADDRESS } from './constants/address'
 enum ImageStatus {
   NotUpload,
   Uploading,
@@ -63,7 +64,7 @@ const addImageOptions = {
 const client = create({ url: 'https://ipfs.infura.io:5001/api/v0' })
 
 function App() {
-  const { account } = useActiveWeb3React();
+  const { account, chainId } = useActiveWeb3React();
   const [form] = Form.useForm();
   const [imageURI, setImageURI] = useState<string>("");
   const [previewURL, setPreviewURL] = useState<string>("")
@@ -192,11 +193,11 @@ function App() {
           else if ((err.data?.code) && (err.data.code === -32000)) {
             openNotificationWithIcon("error", "交易錯誤", "不好意思，免費的gas fee已經用完")
           }
-          else if ((err.data?.code) && (err.code === -32603)) {
-            openNotificationWithIcon("error", "交易錯誤", "您的交易發生錯誤，請檢查您是否已經鑄造過或是超過指定的鑄造時間")
+          else if (err.code === -32603) {
+            openNotificationWithIcon("error", "交易錯誤", "您的交易發生錯誤，請檢查您是否已經鑄造過或是不在指定的鑄造時間")
           }
           else if ((err.code === "UNPREDICTABLE_GAS_LIMIT")) {
-            openNotificationWithIcon("error", "交易錯誤", "您的交易發生錯誤，請檢查您是否已經鑄造過或是超過指定的鑄造時間")
+            openNotificationWithIcon("error", "交易錯誤", "您的交易發生錯誤，請檢查您是否已經鑄造過或是不在指定的鑄造時間")
           }
           setMintStatus(PageStatus.Error);
         }
@@ -323,10 +324,12 @@ function App() {
                     <Result
                       status="success"
                       title="你已經成功鑄造您的公投NFT!"
-                      // subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
                       subTitle={<div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
                         <Text>Token ID: #{tokenId?.toString()}</Text>
-                        <Text>Transaction: <a href={`https://mumbai.polygonscan.com/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://mumbai.polygonscan.com/tx/${transactionHash}`)}</a></Text>
+                        {chainId ?
+                          <Text>Transaction: <a href={`${BLOCKEXPLORER_URL[chainId]}/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`${BLOCKEXPLORER_URL[chainId]}/tx/${transactionHash}`)}</a></Text> :
+                          <Text>Transaction: <a href={`https://polygonscan.com/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://polygonscan.com/tx/${transactionHash}`)}</a></Text>
+                        }
                         <Text>IPFS URL: <a href={`https://ipfs.io/ipfs/${metadataCID}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://ipfs.io/ipfs/${metadataCID}`)}</a></Text></div>}
                       extra={[
                         <FacebookShareButton
@@ -354,7 +357,12 @@ function App() {
       </Content >
       <Footer>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Donation:  <a href={`https://mumbai.polygonscan.com/address/0x2f201Dcc51Dd30B060F1339ed55fAeE5b82F6F38`} target="_blank" rel="noreferrer">{getEllipsisTxt("0x2f201Dcc51Dd30B060F1339ed55fAeE5b82F6F38")}</a></div>
+          {
+            chainId ?
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Donation:  <a href={`${BLOCKEXPLORER_URL[chainId]}/address/${REFERENDUM_NFT_ADDRESS[chainId]}`} target="_blank" rel="noreferrer">{getEllipsisTxt(REFERENDUM_NFT_ADDRESS[chainId])}</a></div>
+              :
+              <></>
+          }
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Text>Powered by © <a href='https://nft-press.io/' target="_blank" rel="noreferrer">RebirthLab</a></Text>
           </div>

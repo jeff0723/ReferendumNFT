@@ -14,6 +14,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const referendum = await deploy("Referendum", {
     from: deployer,
     args: [startMint, endMint],
+    gasPrice: BigNumber.from("100000000000"),
   });
   console.log("Referendum deployed to:", referendum.address);
   console.log(
