@@ -18,7 +18,7 @@ describe("Referendum", function () {
       await referendumContract.democracyToken(),
       dev
     )
-    console.log("Referendum contract address: ", referendumDeployment.address);
+
     const baseURI = "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/";
 
     // self-mint

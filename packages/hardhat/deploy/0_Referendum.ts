@@ -3,7 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { BigNumber } from "@ethersproject/bignumber";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deploy } = hre.deployments;
+  const { deploy, read } = hre.deployments;
   const { deployer } = await hre.getNamedAccounts();
   const chainId = await hre.getChainId();
   const startMint = chainId === "1337"?
@@ -16,6 +16,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [startMint, endMint]
   });
   console.log("Referendum deployed to:", referendum.address);
+  console.log("DemocracyToken deployed to:", await read("Referendum", "democracyToken"));
 };
 export default func;
 func.tags = ["referendum"];
