@@ -15,7 +15,6 @@ import { BigNumber, ContractReceipt, ethers, Wallet } from 'ethers';
 import { openNotificationWithIcon } from './helpers/notification'
 import { BLOCKEXPLORER_URL } from './constants/blockExplorer'
 import { getEllipsisTxt } from './helpers/formatters'
-import Countdown from 'react-countdown';
 
 
 enum ImageStatus {
@@ -291,9 +290,8 @@ function App() {
                         </div>
                       </Form.Item>
                       <Form.Item name="gasfree" valuePropName="checked" >
-                        <Checkbox value={true}><Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>免Gas Fee鑄造</Tooltip></Checkbox>
-                        <br />
-                        <span style={{ fontStyle: 'underline', color: '#69c0ff', padding: '5px', borderRadius: '8px', fontWeight: 500, fontSize: '12px' }}>GAS餘額: {parseFloat(feePayerBalance).toFixed(2)} MATIC</span>
+                        <Checkbox value={true}><Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>免Gas Fee鑄造<br />
+                          <span style={{ color: '#69c0ff', fontWeight: 500, fontSize: '12px' }}>GAS餘額: {parseFloat(feePayerBalance).toFixed(2)} MATIC</span></Tooltip></Checkbox>
                       </Form.Item>
                       <div style={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
                         <Button type="primary" htmlType="submit" style={{ borderRadius: '16px', width: '100%' }}>
