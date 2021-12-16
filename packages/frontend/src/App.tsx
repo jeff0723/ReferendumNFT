@@ -12,7 +12,7 @@ import metadataTemplate from './metadata-template.json'
 import { FacebookShareButton, TwitterShareButton } from "react-share";
 import "./style.css";
 import { BigNumber, ContractReceipt, ethers, Wallet } from 'ethers';
-import { removeAllListeners } from 'process';
+import { openNotificationWithIcon } from './helpers/notification'
 
 enum ImageStatus {
   NotUpload,
@@ -103,14 +103,12 @@ function App() {
   const handleUploadChange = async (e: any) => {
     console.log("any: ", e.target.files[0]);
     setImageStatus(ImageStatus.Uploading)
-    const cid = await client.add(e.target.files[0], addImageOptions)
+    await client.add(e.target.files[0], addImageOptions)
       .then(response => {
         setImageStatus(ImageStatus.Uploaded)
         setPreviewURL(URL.createObjectURL(e.target.files[0]))
         setImageURI(`ipfs://${response.cid.toString()}`)
-        return response.cid.toString()
       })
-    console.log("CID: ", cid);
 
   }
   const handleReceipt = (receipt: ContractReceipt) => {
@@ -150,6 +148,7 @@ function App() {
         try {
           if (isGasFree) {
             if (!feePayer) return;
+            openNotificationWithIcon("success", "交易正在發送中", "您已使用免Gas Fee的方式送出交易，交易正在處理中請您耐心等候。")
             const tx = await referendumContract.connect(feePayer).mintTo(response.cid.toString(), account, { gasPrice: "100000000000" });
             handleReceipt(await tx.wait());
           }
@@ -158,7 +157,7 @@ function App() {
             handleReceipt(await tx.wait());
           }
         } catch (err: any) {
-          alert(err.data ? err.data.message : err.message);
+          openNotificationWithIcon("error", "交易錯誤", "您的交易發生錯誤，請檢查您是否已經鑄造過或是超過指定的鑄造時間")
           setMintStatus(PageStatus.Error);
         }
         return response.cid.toString();
@@ -203,10 +202,10 @@ function App() {
           </div>
         </Drawer>
       </Header>
-      <Content style={{ minHeight: 'calc(100vh - 48px)', marginBottom: (!isTablet ? "32px" : '0px') }}>
+      <Content style={{ marginTop: '64px', minHeight: 'calc(100vh - 48px)', marginBottom: (!isTablet ? "32px" : '0px') }}>
         <Row style={{ minHeight: 'calc(100vh - 48px)' }}>
           <Col span={24} lg={12} >
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', minHeight: '60vh' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', minHeight: 'calc(100vh - 64px)' }}>
               <div>
                 <Text style={{ ...styles.title, fontSize: (isDesktop ? "48px" : '32px') }}>紀念你的重要時刻</Text>
               </div>
@@ -219,7 +218,7 @@ function App() {
           </Col>
           {!isTablet ? <Divider style={{ marginBottom: '32px' }} /> : <></>}
           <Col span={24} lg={12}>
-            <div style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ padding: '16px', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 48px)' }}>
               <Card
                 style={{
                   borderRadius: '16px',
@@ -237,22 +236,36 @@ function App() {
                       size={'large'}
                       onFinish={handleFinish}
                     >
-                      <Form.Item name='name' label="名字" required tooltip="為您的專屬時刻起的名字吧">
+                      <Form.Item name='name' label="名字" required tooltip="為您的專屬時刻起的名字吧" rules={[
+                        {
+                          required: true,
+                          message: '請輸入您的NFT的名字',
+                        },
+                      ]}>
                         <Input placeholder="input placeholder" />
                       </Form.Item>
-                      <Form.Item name='description' label="你的心情" required tooltip="紀錄你當下的心情">
+                      <Form.Item name='description' label="你的心情" required tooltip="紀錄你當下的心情" rules={[
+                        {
+                          required: true,
+                          message: '請輸入一段話描述您的心情',
+                        },
+                      ]}>
                         <Input placeholder="input placeholder" />
                       </Form.Item>
-                      <Form.Item label="你的時刻" required tooltip="上傳一張照片紀念這個時刻">
+                      <Form.Item name='image' label="你的時刻" required tooltip="上傳一張照片紀念這個時刻" rules={[
+                        {
+                          required: true,
+                          message: '請上傳一張照片',
+                        },
+                      ]}>
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                           <input type="file" id="actual-btn" hidden onChange={handleUploadChange} />
                           <label htmlFor="actual-btn">{imageStatus !== ImageStatus.Uploaded ? uploadButton : <img src={previewURL} alt='preview' height='100%' width="100%" style={{ maxHeight: '200px', maxWidth: '200px' }} />}</label>
                         </div>
                       </Form.Item>
                       <Form.Item name="gasfree" valuePropName="checked" >
-                        <Checkbox value={true}>{`免Gas Fee鑄造(${feePayerBalance})`}</Checkbox>
-                        {/* <Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>
-                      </Tooltip> */}
+                        <Checkbox value={true}><Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>免Gas Fee鑄造</Tooltip></Checkbox>
+
                       </Form.Item>
                       <div style={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
                         <Button type="primary" htmlType="submit" style={{ borderRadius: '16px', width: '100%' }}>
@@ -293,7 +306,7 @@ function App() {
       </Content >
       <Footer>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Powered by © RebirthLab</Text>
+          <Text>Powered by © <a href='https://nft-press.io/' target="_blank" rel="noreferrer">RebirthLab</a></Text>
         </div>
       </Footer>
     </Layout >
