@@ -56,8 +56,8 @@ export const networkConfigs = {
       chainName: "Polygon Mainnet",
       currencyName: "MATIC",
       currencySymbol: "MATIC",
-      rpcUrl: "https://rpc-mainnet.maticvigil.com/",
-      blockExplorerUrl: "https://explorer-mainnet.maticvigil.com/",
+      rpcUrl: "https://polygon-rpc.com/",
+      blockExplorerUrl: "https://polygonscan.com/",
       wrapped: "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
     },
     "0x13881": {
@@ -65,7 +65,7 @@ export const networkConfigs = {
       chainName: "Mumbai",
       currencyName: "MATIC",
       currencySymbol: "MATIC",
-      rpcUrl: "https://rpc-mumbai.maticvigil.com/",
+      rpcUrl: "https://matic-mumbai.chainstacklabs.com",
       blockExplorerUrl: "https://mumbai.polygonscan.com/",
     },
   };
