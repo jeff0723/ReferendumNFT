@@ -6,7 +6,7 @@ const useChain = () => {
   async function switchNetwork(chain) {
     if (library) {
       try {
-          await library.provider?.request({
+          await library?.provider.request({
             method: "wallet_switchEthereumChain",
             params: [{ chainId: chain}],
           });
@@ -16,7 +16,7 @@ const useChain = () => {
             const config = networkConfigs[chain];
             const { chainName, currencyName, currencySymbol, rpcUrl, blockExplorerUrl } =
               config;
-            await library.provider.request({
+            await library?.provider.request({
                 method: "wallet_addEthereumChain",
                 params: [
                     {
