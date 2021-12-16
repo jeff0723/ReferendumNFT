@@ -13,7 +13,10 @@ import { FacebookShareButton, TwitterShareButton } from "react-share";
 import "./style.css";
 import { BigNumber, ContractReceipt, ethers, Wallet } from 'ethers';
 import { openNotificationWithIcon } from './helpers/notification'
-
+interface ProviderMessage {
+  type: string;
+  data: unknown;
+}
 enum ImageStatus {
   NotUpload,
   Uploading,
@@ -62,7 +65,7 @@ const addImageOptions = {
 const client = create({ url: 'https://ipfs.infura.io:5001/api/v0' })
 
 function App() {
-  const { chainId, account } = useActiveWeb3React();
+  const { library, chainId, account } = useActiveWeb3React();
   const [form] = Form.useForm();
   const [imageURI, setImageURI] = useState<string>("");
   const [previewURL, setPreviewURL] = useState<string>("")
@@ -86,6 +89,7 @@ function App() {
     }
     fetchFeePayerBalance();
   }, [feePayer]);
+
   const isDesktop = useMediaQuery({
     query: '(min-width: 576px)'
   })
@@ -113,7 +117,7 @@ function App() {
   }
   const handleReceipt = (receipt: ContractReceipt) => {
     if (receipt.status === 0) {
-      console.log("PageError");
+      openNotificationWithIcon("error", "交易錯誤", "您的交易發生錯誤，請檢查您是否已經鑄造過或是超過指定的鑄造時間")
       setMintStatus(PageStatus.Error);
       return;
     }
@@ -143,27 +147,36 @@ function App() {
     template.description = values.description;
     template.image = imageURI;
     setMintStatus(PageStatus.Uploading);
-    const cid = await client.add(JSON.stringify(template), addImageOptions)
+    await client.add(JSON.stringify(template), addImageOptions)
       .then(async (response) => {
         try {
           if (isGasFree) {
             if (!feePayer) return;
+            const tx = await referendumContract.connect(feePayer).mintTo("ipfs://" + response.cid.toString(), account, { gasPrice: "100000000000" });
             openNotificationWithIcon("success", "交易正在發送中", "您已使用免Gas Fee的方式送出交易，交易正在處理中請您耐心等候。")
-            const tx = await referendumContract.connect(feePayer).mintTo(response.cid.toString(), account, { gasPrice: "100000000000" });
             handleReceipt(await tx.wait());
           }
           else {
-            const tx = await referendumContract.mint(response.cid.toString());
+            const tx = await referendumContract.mint("ipfs://" + response.cid.toString());
             handleReceipt(await tx.wait());
           }
         } catch (err: any) {
-          console.log('err: ', err)
-          openNotificationWithIcon("error", "交易錯誤", "您的交易發生錯誤，請檢查您是否已經鑄造過或是超過指定的鑄造時間")
+          console.log(typeof err.code)
+          if (err.code === 4001) {
+            openNotificationWithIcon("error", "交易錯誤", "您已拒絕了交易")
+          }
+          else if ((err.data?.code) && (err.data.code === -32000)) {
+            openNotificationWithIcon("error", "交易錯誤", "不好意思，免費的gas fee已經用完")
+          }
+          else if ((err.data?.code) && (err.code === -32603)) {
+            openNotificationWithIcon("error", "交易錯誤", "您的交易發生錯誤，請檢查您是否已經鑄造過或是超過指定的鑄造時間")
+          }
+          else if ((err.code === "UNPREDICTABLE_GAS_LIMIT")) {
+            openNotificationWithIcon("error", "交易錯誤", "您的交易發生錯誤，請檢查您是否已經鑄造過或是超過指定的鑄造時間")
+          }
           setMintStatus(PageStatus.Error);
         }
-        return response.cid.toString();
       })
-    console.log("cid: ", cid);
   }
   console.log("imageURI: ", imageURI)
   return (
