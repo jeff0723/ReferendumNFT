@@ -17,6 +17,7 @@ import { BLOCKEXPLORER_URL } from './constants/blockExplorer'
 import { getEllipsisTxt } from './helpers/formatters'
 import Countdown from 'react-countdown';
 
+
 enum ImageStatus {
   NotUpload,
   Uploading,
@@ -222,16 +223,18 @@ function App() {
           </div>
         </Drawer>
       </Header>
-      <Content style={{ marginTop: '64px', minHeight: 'calc(100vh - 48px)', marginBottom: (!isTablet ? "32px" : '0px') }}>
+      <Content style={{ marginTop: '64px', minHeight: 'calc(100vh - 48px)' }}>
         <Row style={{ minHeight: 'calc(100vh - 48px)' }}>
           <Col span={24} lg={12} >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', minHeight: 'calc(100vh - 64px)', gap: '6px' }}>
               <div>
-                <Text style={{ ...styles.title, fontSize: (isDesktop ? "48px" : '32px') }}>紀念你的重要時刻</Text>
+                <Text style={{ ...styles.title, fontSize: (isDesktop ? "48px" : '32px') }}>紀念你的重要時刻</Text><br />
               </div>
               <div>
                 <Text style={{ ...styles.subtitle, fontSize: (isDesktop ? "16px" : '12px') }}>#Vote For NFT</Text>
                 <Text style={{ ...styles.subtitle, marginLeft: "5px", fontSize: (isDesktop ? "16px" : '12px') }}>#Democracy Token</Text>
+                <Text style={{ ...styles.subtitle, marginLeft: "5px", fontSize: (isDesktop ? "16px" : '12px') }}>#iVoted</Text>
+
               </div>
               <div>
                 <span style={{ backgroundColor: "#fff0f6", color: '#ff85c0', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>公投NFT發行量: </span>
@@ -333,8 +336,11 @@ function App() {
 
       </Content >
       <Footer>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Powered by © <a href='https://nft-press.io/' target="_blank" rel="noreferrer">RebirthLab</a></Text>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Donation:  <a href={`https://polygonscan.com/address/0x5fbdb2315678afecb367f032d93f642f64180aa3`} target="_blank" rel="noreferrer">{getEllipsisTxt("0x5FbDB2315678afecb367f032d93F642f64180aa3")}</a></div>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Powered by © <a href='https://nft-press.io/' target="_blank" rel="noreferrer">RebirthLab</a></Text>
+          </div>
         </div>
       </Footer>
     </Layout >
