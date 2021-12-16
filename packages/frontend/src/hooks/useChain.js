@@ -1,8 +1,8 @@
 import { networkConfigs } from "../helpers/networks";
+import { openNotificationWithIcon } from '../helpers/notification';
 import { useActiveWeb3React } from './web3';
-import {injected} from '../connectors'
 const useChain = () => {
-  const { library,activate } = useActiveWeb3React();
+  const { library } = useActiveWeb3React();
   async function switchNetwork(chain) {
     if (library) {
       try {
@@ -38,7 +38,8 @@ const useChain = () => {
         }
       }
     } else {
-        activate(injected,undefined,true).catch(err=>console.log(err));
+      openNotificationWithIcon("warning","尚未連接錢包","請先連接錢包再切換網路")
+        // activate(injected,undefined,true).catch(err=>console.log(err));
     }
   }
   return { switchNetwork };
