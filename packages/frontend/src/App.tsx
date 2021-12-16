@@ -157,6 +157,7 @@ function App() {
             handleReceipt(await tx.wait());
           }
         } catch (err: any) {
+          console.log('err: ', err)
           openNotificationWithIcon("error", "交易錯誤", "您的交易發生錯誤，請檢查您是否已經鑄造過或是超過指定的鑄造時間")
           setMintStatus(PageStatus.Error);
         }
