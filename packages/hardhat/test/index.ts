@@ -1,12 +1,15 @@
 import { expect } from "chai";
-//@ts-ignore
 import { ethers, deployments } from "hardhat";
-import { Referendum__factory } from "../../frontend/src/typechain";
+import { DemocracyToken__factory, Referendum__factory } from "../../frontend/src/typechain";
+
+async function sleep(ms = 0) {
+  return new Promise(r => setTimeout(r, ms));
+}
 
 describe("Referendum", function () {
   it("mint", async function () {
     // Accounts
-    const [dev, user1] = await ethers.getSigners();
+    const [dev, user1, user2, user3] = await ethers.getSigners();
 
     // Deployment
     await deployments.fixture(["referendum"]);
@@ -15,19 +18,47 @@ describe("Referendum", function () {
       referendumDeployment.address,
       dev
     );
+    const democracyTokenContract = DemocracyToken__factory.connect(
+      await referendumContract.democracyToken(),
+      dev
+    )
     console.log("Referendum contract address: ", referendumDeployment.address);
     const baseURI = "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/";
 
+    // self-mint
     const tokenURI0 = baseURI + "0";
-    const tx0 = await referendumContract.mint(tokenURI0);
+    const tx0 = await referendumContract.connect(user1).mint(tokenURI0);
     await tx0.wait();
     expect((await referendumContract.tokenURI(0)) === tokenURI0);
-    expect((await referendumContract.ownerOf(0) === dev.address));
+    expect((await referendumContract.ownerOf(0) === user1.address));
+    expect(ethers.utils.parseEther("2").eq(await democracyTokenContract.balanceOf(user1.address)));
 
+    // free-mint
     const tokenURI1 = baseURI + "1";
-    const tx1 = await referendumContract.connect(dev).mintTo(tokenURI1, user1.address);
+    const tx1 = await referendumContract.connect(dev).mintTo(tokenURI1, user2.address);
     await tx1.wait();
     expect((await referendumContract.tokenURI(1)) === tokenURI0);
-    expect((await referendumContract.ownerOf(0) === user1.address));
+    expect((await referendumContract.ownerOf(0) === user2.address));
+    expect(ethers.utils.parseEther("1").eq(await democracyTokenContract.balanceOf(user2.address)));
+
+    // donate
+    const devBalance = await dev.getBalance();
+    const donate = ethers.utils.parseEther("5");
+    user3.sendTransaction({
+      to: referendumContract.address,
+      value: donate
+    })
+    expect(devBalance.add(donate).eq(await dev.getBalance()));
+    expect(donate.eq(await democracyTokenContract.balanceOf(user3.address)));
+
+    await sleep(5000);
+
+    // mint Democracy Spirit NFT
+    const tokenURI2 = baseURI + "777";
+    const tx2 = await referendumContract.mintDemocracySpiritNFT(tokenURI2);
+    await tx2.wait();
+    const totalSupply = await referendumContract.totalSupply();
+    expect((await referendumContract.tokenURI(totalSupply)) === tokenURI2);
+    expect((await referendumContract.ownerOf(totalSupply)) === referendumContract.address);
   });
 });

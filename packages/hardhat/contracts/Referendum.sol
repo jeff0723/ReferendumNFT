@@ -46,7 +46,7 @@ contract Referendum is ERC721URIStorage {
         );
         require(!_isMinted[to_], "Already minted");
         _isMinted[to_] = true;
-        _mint(to_, totalSupply);
+        _safeMint(to_, totalSupply);
         _setTokenURI(totalSupply, string(tokenURI_));
         democracyToken.mint(to_, 1);
         totalSupply++;
