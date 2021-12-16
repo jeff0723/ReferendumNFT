@@ -135,7 +135,7 @@ function App() {
       })
 
   }
-  const handleReceipt = (receipt: ContractReceipt) => {
+  const handleReceipt = async (receipt: ContractReceipt) => {
     if (receipt.status === 0) {
       openNotificationWithIcon("error", "交易錯誤", "您的交易發生錯誤，請檢查您是否已經鑄造過或是超過指定的鑄造時間")
       setMintStatus(PageStatus.Error);
@@ -151,6 +151,12 @@ function App() {
         setTokenId(tokenId);
       }
       setMintStatus(PageStatus.Finished);
+      if (referendumContract) {
+        setNftSupply((await referendumContract.totalSupply()).toString());
+      }
+      if (democracyToken) {
+        setTokenSupply(ethers.utils.formatEther(await democracyToken.totalSupply()));
+      }
     }
   }
 
