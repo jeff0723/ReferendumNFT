@@ -15,6 +15,7 @@ export enum SupportedChainId {
     OPTIMISM = 10,
     OPTIMISTIC_KOVAN = 69,
     MUMBAI = 80001,
+    POLYGON = 137,
     HARDHAT = 1337,
   }
   export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
@@ -29,7 +30,9 @@ export enum SupportedChainId {
     SupportedChainId.OPTIMISM,
     SupportedChainId.OPTIMISTIC_KOVAN,
     SupportedChainId.MUMBAI,
+    SupportedChainId.POLYGON,
     SupportedChainId.HARDHAT,
+    
   ]
 const NETWORK_URLS: { [key in SupportedChainId]: string } = {
     [SupportedChainId.MAINNET]: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
@@ -42,6 +45,7 @@ const NETWORK_URLS: { [key in SupportedChainId]: string } = {
     [SupportedChainId.ARBITRUM_ONE]: `https://arbitrum-mainnet.infura.io/v3/${INFURA_KEY}`,
     [SupportedChainId.ARBITRUM_RINKEBY]: `https://arbitrum-rinkeby.infura.io/v3/${INFURA_KEY}`,
     [SupportedChainId.MUMBAI]: "https://polygon-mumbai.g.alchemy.com/v2/YeWNsmNZnmrXElTepCA6Js4GG7bt366I",
+    [SupportedChainId.POLYGON]: "https://polygon-mainnet.g.alchemy.com/v2/Lryl_V_CrzMOEQFwr9E6ADuLta8DB3ix",
     [SupportedChainId.HARDHAT]: "http://127.0.0.1:8545",
 }
 

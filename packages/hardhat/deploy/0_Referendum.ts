@@ -6,17 +6,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy, read } = hre.deployments;
   const { deployer } = await hre.getNamedAccounts();
   const chainId = await hre.getChainId();
-  const startMint = chainId === "1337"?
-    BigNumber.from((new Date()).getTime()).div(1000).sub(60) // for test
-    :
-    BigNumber.from((new Date(2021, 12, 18)).getTime()).div(1000);
-  const endMint = startMint.add(172800);
+  const startMint =
+    chainId === "137"
+      ? BigNumber.from(new Date(2021, 11, 18, 8).getTime()).div(1000)
+      : BigNumber.from(new Date().getTime()).div(1000).sub(60); // for test
+  const endMint = startMint.add(40 * 60 * 60);
   const referendum = await deploy("Referendum", {
     from: deployer,
-    args: [startMint, endMint]
+    args: [startMint, endMint],
   });
   console.log("Referendum deployed to:", referendum.address);
-  console.log("DemocracyToken deployed to:", await read("Referendum", "democracyToken"));
+  console.log(
+    "DemocracyToken deployed to:",
+    await read("Referendum", "democracyToken")
+  );
 };
 export default func;
 func.tags = ["referendum"];

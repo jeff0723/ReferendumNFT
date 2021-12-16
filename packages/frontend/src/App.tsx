@@ -15,7 +15,6 @@ import { BigNumber, ContractReceipt, ethers, Wallet } from 'ethers';
 import { openNotificationWithIcon } from './helpers/notification'
 import { BLOCKEXPLORER_URL } from './constants/blockExplorer'
 import { getEllipsisTxt } from './helpers/formatters'
-
 enum ImageStatus {
   NotUpload,
   Uploading,
@@ -37,7 +36,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    background: "linear-gradient(270deg, #eef8fa 0%, rgba(24,178,255,1)  100%)",
+    background: "linear-gradient(270deg, #b5f5ec 10%, #87e8de 50%, #91d5ff 70%,#40a9ff 100% )",
     color: '#ffffff',
     // border: "1px solid #e7eaf3"
   },
@@ -64,7 +63,7 @@ const addImageOptions = {
 const client = create({ url: 'https://ipfs.infura.io:5001/api/v0' })
 
 function App() {
-  const { chainId, account } = useActiveWeb3React();
+  const { account } = useActiveWeb3React();
   const [form] = Form.useForm();
   const [imageURI, setImageURI] = useState<string>("");
   const [previewURL, setPreviewURL] = useState<string>("")
@@ -80,7 +79,6 @@ function App() {
   const democracyToken = useDemocracyToken();
   const [tokenSupply, setTokenSupply] = useState<string>("");
   const [nftSupply, setNftSupply] = useState<string>("");
-
   useEffect(() => {
     const fetchNftSupply = async () => {
       if (referendumContract) {
@@ -116,8 +114,7 @@ function App() {
   const isTablet = useMediaQuery({
     query: '(min-width: 992px)'
   })
-  console.log("App: ", chainId)
-  console.log("Desktop: ", isDesktop)
+
   const uploadButton = (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
       {imageStatus === ImageStatus.Uploading ? <LoadingOutlined /> : <PlusOutlined />}
@@ -162,14 +159,12 @@ function App() {
 
   const handleFinish = async (values: any) => {
     if (!account || !referendumContract) {
-      console.log("account:", account);
-      console.log("contract:", referendumContract);
       return;
     }
-    console.log("Success: ", values);
+
     let template = metadataTemplate;
     const isGasFree = values.gasfree;
-    console.log("start to submit");
+
     template.name = values.name;
     template.description = values.description;
     template.image = imageURI;
@@ -181,7 +176,7 @@ function App() {
         try {
           if (isGasFree) {
             if (!feePayer) return;
-            const tx = await referendumContract.connect(feePayer).mintTo("ipfs://" + response.cid.toString(), account, { gasPrice: "100000000000" });
+            const tx = await referendumContract.connect(feePayer).mintTo("ipfs://" + response.cid.toString(), account, { gasPrice: "200000000000" });
             openNotificationWithIcon("success", "交易正在發送中", "您已使用免Gas Fee的方式送出交易，交易正在處理中請您耐心等候。")
             handleReceipt(await tx.wait());
           }
@@ -260,8 +255,8 @@ function App() {
 
               </div>
               <div>
-                <span style={{ backgroundColor: "#fff0f6", color: '#ff85c0', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>{`公投NFT發行量: ${nftSupply}`} </span>
-                <span style={{ marginLeft: "16px", backgroundColor: "#e6f7ff", color: '#40a9ff', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>{`民主代幣發行量: ${parseInt(tokenSupply).toFixed(2)}`} </span>
+                <span style={{ backgroundColor: "#fff0f6", color: '#ff85c0', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>{`公投NFT發行量: ${nftSupply ? nftSupply : 0}`} </span>
+                <span style={{ marginLeft: "16px", backgroundColor: "#e6f7ff", color: '#40a9ff', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>{`民主代幣發行量: ${tokenSupply ? parseInt(tokenSupply).toFixed(2) : 0}`} </span>
 
               </div>
             </div>
@@ -292,7 +287,7 @@ function App() {
                           message: '請輸入您的NFT的名字',
                         },
                       ]}>
-                        <Input placeholder="input placeholder" />
+                        <Input placeholder="名字..." />
                       </Form.Item>
                       <Form.Item name='description' label="你的心情" required tooltip="紀錄你當下的心情" rules={[
                         {
@@ -300,7 +295,7 @@ function App() {
                           message: '請輸入一段話描述您的心情',
                         },
                       ]}>
-                        <Input placeholder="input placeholder" />
+                        <Input placeholder="描述..." />
                       </Form.Item>
                       <Form.Item name='image' label="你的時刻" required tooltip="上傳一張照片紀念這個時刻" rules={[
                         {
@@ -315,7 +310,7 @@ function App() {
                       </Form.Item>
                       <Form.Item name="gasfree" valuePropName="checked" >
                         <Checkbox value={true}><Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>免Gas Fee鑄造<br />
-                          <span style={{ color: '#69c0ff', fontWeight: 500, fontSize: '12px' }}>GAS餘額: {parseFloat(feePayerBalance).toFixed(2)} MATIC</span></Tooltip></Checkbox>
+                          <span style={{ color: '#69c0ff', fontWeight: 500, fontSize: '12px' }}>GAS餘額: {feePayerBalance ? parseFloat(feePayerBalance).toFixed(2) : "0"} MATIC</span></Tooltip></Checkbox>
                       </Form.Item>
                       <div style={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
                         <Button type="primary" htmlType="submit" style={{ borderRadius: '16px', width: '100%' }}>
@@ -337,14 +332,14 @@ function App() {
                         <FacebookShareButton
                           url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
                           quote={`我已成功鑄造公投NFT(Referendum NFT) #${tokenId?.toString()}`}
-                          hashtag={"#VoteForNFT"}
+                          hashtag={"#iVoted"}
                         >
                           <FacebookFilled style={{ color: '#4267B2' }} /> 分享到Facebook
                         </FacebookShareButton>,
                         <TwitterShareButton
                           url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
                           title={`我已成功鑄造公投NFT(Referendum NFT) #${tokenId?.toString()}`}
-                          hashtags={["VoteForNFT", "DemocracyToken"]}>
+                          hashtags={["VoteForNFT", "DemocracyToken", "iVoted"]}>
                           <TwitterSquareFilled style={{ color: '#00acee' }} /> 分享到Twitter
                         </TwitterShareButton>,
                       ]}
@@ -359,7 +354,7 @@ function App() {
       </Content >
       <Footer>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Donation:  <a href={`https://polygonscan.com/address/0x5fbdb2315678afecb367f032d93f642f64180aa3`} target="_blank" rel="noreferrer">{getEllipsisTxt("0x5FbDB2315678afecb367f032d93F642f64180aa3")}</a></div>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Donation:  <a href={`https://mumbai.polygonscan.com/address/0x2f201Dcc51Dd30B060F1339ed55fAeE5b82F6F38`} target="_blank" rel="noreferrer">{getEllipsisTxt("0x2f201Dcc51Dd30B060F1339ed55fAeE5b82F6F38")}</a></div>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Text>Powered by © <a href='https://nft-press.io/' target="_blank" rel="noreferrer">RebirthLab</a></Text>
           </div>
