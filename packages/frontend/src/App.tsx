@@ -13,10 +13,10 @@ import { FacebookShareButton, TwitterShareButton } from "react-share";
 import "./style.css";
 import { BigNumber, ContractReceipt, ethers, Wallet } from 'ethers';
 import { openNotificationWithIcon } from './helpers/notification'
-interface ProviderMessage {
-  type: string;
-  data: unknown;
-}
+import { BLOCKEXPLORER_URL } from './constants/blockExplorer'
+import { getEllipsisTxt } from './helpers/formatters'
+import Countdown from 'react-countdown';
+
 enum ImageStatus {
   NotUpload,
   Uploading,
@@ -65,7 +65,7 @@ const addImageOptions = {
 const client = create({ url: 'https://ipfs.infura.io:5001/api/v0' })
 
 function App() {
-  const { library, chainId, account } = useActiveWeb3React();
+  const { chainId, account } = useActiveWeb3React();
   const [form] = Form.useForm();
   const [imageURI, setImageURI] = useState<string>("");
   const [previewURL, setPreviewURL] = useState<string>("")
@@ -73,6 +73,8 @@ function App() {
   const [mintStatus, setMintStatus] = useState(PageStatus.Edit);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [feePayer, setFeePayer] = useState<Wallet>();
+  const [transactionHash, setTransactionHash] = useState("");
+  const [metadataCID, setMetadataCID] = useState("");
   const [feePayerBalance, setFeePayerBalance] = useState<string>("");
   const [tokenId, setTokenId] = useState<BigNumber>();
   const referendumContract = useReferendumContract();
@@ -124,6 +126,7 @@ function App() {
     // console.log("receipt:", receipt.events);
     if (receipt.events && receipt.events[0].args) {
       const tokenId = receipt.events[0].args[2];
+      setTransactionHash(receipt.transactionHash);
       setTokenId(tokenId);
       console.log("tokenId:", tokenId);
       if (tokenId) {
@@ -147,8 +150,10 @@ function App() {
     template.description = values.description;
     template.image = imageURI;
     setMintStatus(PageStatus.Uploading);
+
     await client.add(JSON.stringify(template), addImageOptions)
       .then(async (response) => {
+        setMetadataCID(response.cid.toString());
         try {
           if (isGasFree) {
             if (!feePayer) return;
@@ -179,11 +184,12 @@ function App() {
       })
   }
   console.log("imageURI: ", imageURI)
+  console.log("Block:", BLOCKEXPLORER_URL)
   return (
     <Layout style={{ backgroundColor: "#ffffff" }}>
       <Header style={{ ...styles.header, position: 'fixed', zIndex: 1, width: '100%' }}>
         <div>
-          <Text style={{ color: '#ffffff', fontSize: '16px', fontWeight: 'bold' }}>Referendum</Text>
+          <Text style={{ color: '#ffffff', fontSize: '16px', fontWeight: 'bold' }}>Referendum NFT</Text>
         </div>
         <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
           {isTablet ?
@@ -219,7 +225,7 @@ function App() {
       <Content style={{ marginTop: '64px', minHeight: 'calc(100vh - 48px)', marginBottom: (!isTablet ? "32px" : '0px') }}>
         <Row style={{ minHeight: 'calc(100vh - 48px)' }}>
           <Col span={24} lg={12} >
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', minHeight: 'calc(100vh - 64px)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', minHeight: 'calc(100vh - 64px)', gap: '6px' }}>
               <div>
                 <Text style={{ ...styles.title, fontSize: (isDesktop ? "48px" : '32px') }}>紀念你的重要時刻</Text>
               </div>
@@ -227,7 +233,11 @@ function App() {
                 <Text style={{ ...styles.subtitle, fontSize: (isDesktop ? "16px" : '12px') }}>#Vote For NFT</Text>
                 <Text style={{ ...styles.subtitle, marginLeft: "5px", fontSize: (isDesktop ? "16px" : '12px') }}>#Democracy Token</Text>
               </div>
+              <div>
+                <span style={{ backgroundColor: "#fff0f6", color: '#ff85c0', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>公投NFT發行量: </span>
+                <span style={{ marginLeft: "16px", backgroundColor: "#e6f7ff", color: '#40a9ff', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>民主代幣發行量: </span>
 
+              </div>
             </div>
           </Col>
           {!isTablet ? <Divider style={{ marginBottom: '32px' }} /> : <></>}
@@ -279,7 +289,8 @@ function App() {
                       </Form.Item>
                       <Form.Item name="gasfree" valuePropName="checked" >
                         <Checkbox value={true}><Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>免Gas Fee鑄造</Tooltip></Checkbox>
-
+                        <br />
+                        <span style={{ fontStyle: 'underline', color: '#69c0ff', padding: '5px', borderRadius: '8px', fontWeight: 500, fontSize: '12px' }}>GAS餘額: {parseFloat(feePayerBalance).toFixed(2)} MATIC</span>
                       </Form.Item>
                       <div style={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
                         <Button type="primary" htmlType="submit" style={{ borderRadius: '16px', width: '100%' }}>
@@ -293,18 +304,21 @@ function App() {
                       status="success"
                       title="你已經成功鑄造您的公投NFT!"
                       // subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
-                      subTitle={`Token ID: ${tokenId?.toString()}`}
+                      subTitle={<div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
+                        <Text>Token ID: #{tokenId?.toString()}</Text>
+                        <Text>Transaction: <a href={`https://mumbai.polygonscan.com/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://mumbai.polygonscan.com/tx/${transactionHash}`)}</a></Text>
+                        <Text>IPFS URL: <a href={`https://ipfs.io/ipfs/${metadataCID}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://ipfs.io/ipfs/${metadataCID}`)}</a></Text></div>}
                       extra={[
                         <FacebookShareButton
                           url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
-                          quote={`我已成功鑄造公投NFT(Referendum NFT #${tokenId?.toString()}`}
+                          quote={`我已成功鑄造公投NFT(Referendum NFT) #${tokenId?.toString()}`}
                           hashtag={"#VoteForNFT"}
                         >
                           <FacebookFilled style={{ color: '#4267B2' }} /> 分享到Facebook
                         </FacebookShareButton>,
                         <TwitterShareButton
                           url={"https://codesandbox.io/s/rrlli?file=/src/App.js:253-557"}
-                          title={`我已成功鑄造公投NFT(Referendum NFT #${tokenId?.toString()}`}
+                          title={`我已成功鑄造公投NFT(Referendum NFT) #${tokenId?.toString()}`}
                           hashtags={["VoteForNFT", "DemocracyToken"]}>
                           <TwitterSquareFilled style={{ color: '#00acee' }} /> 分享到Twitter
                         </TwitterShareButton>,
