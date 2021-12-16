@@ -1,10 +1,6 @@
 import { expect } from "chai";
-import { ethers, deployments } from "hardhat";
+import { ethers, deployments, network } from "hardhat";
 import { DemocracyToken__factory, Referendum__factory } from "../../frontend/src/typechain";
-
-async function sleep(ms = 0) {
-  return new Promise(r => setTimeout(r, ms));
-}
 
 describe("Referendum", function () {
   it("mint", async function () {
@@ -51,7 +47,9 @@ describe("Referendum", function () {
     expect(devBalance.add(donate).eq(await dev.getBalance()));
     expect(donate.eq(await democracyTokenContract.balanceOf(user3.address)));
 
-    await sleep(5000);
+    // pass to end time
+    await network.provider.send("evm_setNextBlockTimestamp", [(await referendumContract.endTime()).toNumber()+60]);
+    await network.provider.send("evm_mine");
 
     // mint Democracy Spirit NFT
     const tokenURI2 = baseURI + "777";

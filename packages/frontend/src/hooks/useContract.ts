@@ -1,9 +1,8 @@
 import { Contract } from '@ethersproject/contracts'
-import {Referendum} from '../typechain/Referendum'
+import { Referendum, Referendum__factory} from '../typechain'
 import { useMemo } from 'react'
 import { useWeb3React } from '@web3-react/core';
 import { getContract } from '../utils/getContract'
-import REFERENDUM_ABI from '../abis/referendum.json'
 import { REFERENDUM_ADDRESS } from '../constants/address';
 export function useContract<T extends Contract = Contract>(
     addressOrAddressMap: string | { [chainId: number]: string } | undefined,
@@ -28,5 +27,5 @@ export function useContract<T extends Contract = Contract>(
 }
 
 export function useReferendumContract() {
-    return useContract<Referendum>(REFERENDUM_ADDRESS, REFERENDUM_ABI, true)
+    return useContract<Referendum>(REFERENDUM_ADDRESS, Referendum__factory.abi, true)
 }
