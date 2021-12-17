@@ -16,7 +16,7 @@ function getLibrary(provider: any): Web3Provider {
         : 'any'
   )
   library.pollingInterval = 15_000
-  library.detectNetwork().then(network => console.log(network))
+  library.detectNetwork().then(network => console.log("detected network:", network))
   return library
 }
 const NetworkContextName = 'NETWORK'
@@ -25,13 +25,13 @@ const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
 
 ReactDOM.render(
   <React.StrictMode>
-    <Web3ReactProvider getLibrary={getLibrary}>
-      <Web3ProviderNetwork getLibrary={getLibrary}>
+    <Web3ProviderNetwork getLibrary={getLibrary}>
+      <Web3ReactProvider getLibrary={getLibrary}>
         <Web3ReactManager>
           <App />
         </Web3ReactManager>
-      </Web3ProviderNetwork>
-    </Web3ReactProvider>
+      </Web3ReactProvider>
+    </Web3ProviderNetwork>
   </React.StrictMode>,
   document.getElementById('root')
 );

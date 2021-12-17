@@ -1,4 +1,6 @@
-export const networkConfigs = {
+type NetworkMap = { [chainId: string]: any }
+
+export const networkConfigs: NetworkMap = {
     "0x1": {
       currencySymbol: "ETH",
       blockExplorerUrl: "https://etherscan.io/",
