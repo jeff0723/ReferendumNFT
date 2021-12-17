@@ -81,10 +81,7 @@ function App() {
   const [tokenSupply, setTokenSupply] = useState<string>("");
   const [nftSupply, setNftSupply] = useState<string>("");
   useEffect(() => {
-    if (!chainId) {
-      openNotificationWithIcon('warning', '尚未連接錢包', '請點擊Menu以連結錢包')
-      return;
-    }
+
     if (chainId === 80001) {
       openNotificationWithIcon('info', '使用測試網路', '您正在使用Mumbai測試網')
       return;
@@ -122,7 +119,6 @@ function App() {
     }
     fetchTokenSupply();
   }, [democracyToken]);
-  console.log(tokenSupply)
   const isDesktop = useMediaQuery({
     query: '(min-width: 576px)'
   })
@@ -152,12 +148,10 @@ function App() {
       setMintStatus(PageStatus.Error);
       return;
     }
-    // console.log("receipt:", receipt.events);
     if (receipt.events && receipt.events[0].args) {
       const tokenId = receipt.events[0].args[2];
       setTransactionHash(receipt.transactionHash);
       setTokenId(tokenId);
-      console.log("tokenId:", tokenId);
       if (tokenId) {
         setTokenId(tokenId);
       }
@@ -207,7 +201,6 @@ function App() {
             handleReceipt(await tx.wait());
           }
         } catch (err: any) {
-          console.log(typeof err.code)
           if (err.code === 4001) {
             openNotificationWithIcon("error", "交易錯誤", "您已拒絕了交易")
           }
