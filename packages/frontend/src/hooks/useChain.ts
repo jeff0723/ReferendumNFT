@@ -1,13 +1,11 @@
 import { networkConfigs } from "../helpers/networks";
-import { openNotificationWithIcon } from '../helpers/notification';
-import { useActiveWeb3React } from './web3';
 import { Web3Provider } from '@ethersproject/providers';
 import { hexStripZeros } from '@ethersproject/bytes';
 import { BigNumber } from '@ethersproject/bignumber';
 
 // provider.request returns Promise<any>, but wallet_switchEthereumChain must return null or throw
 // see https://github.com/rekmarks/EIPs/blob/3326-create/EIPS/eip-3326.md for more info on wallet_switchEthereumChain
-export async function addNetwork(library: Web3Provider, chainId: number, info: any): Promise<null | void> {
+export async function addNetwork(library: Web3Provider, chainId: number): Promise<null | void> {
   if (!library?.provider?.request) {
     return
   }
@@ -54,10 +52,10 @@ export async function switchNetwork(library: Web3Provider, chainId: number) {
       params: [{ chainId: formattedChainId }],
     })
   } catch (error: any) {
-    const info = networkConfigs[formattedChainId];
+    console.log("switch failed error code:", typeof error.code, error.code)
     // metamask (only known implementer) automatically switches after a network is added
     // the second call is done here because that behavior is not a part of the spec and cannot be relied upon in the future
     // metamask's behavior when switching to the current network is just to return null (a no-op)
-    addNetwork(library, chainId, info);
+    addNetwork(library, chainId);
   }
 }

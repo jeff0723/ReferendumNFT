@@ -5,7 +5,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { switchNetwork } from "../../hooks/useChain";
 import { useActiveWeb3React } from '../../hooks/web3'
 import { useMediaQuery } from 'react-responsive';
-import { BigNumber, ethers } from "ethers";
+import { BigNumber } from "ethers";
 
 interface Props {
 
