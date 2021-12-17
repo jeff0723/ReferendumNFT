@@ -59,9 +59,15 @@ const styles = {
     color: '#bfbfbf'
   }
 }
-const openseaURL: { [chainId: number]: string } = {
+const openseaCollectionURL: { [chainId: number]: string } = {
   80001: "https://testnets.opensea.io/collection/referendum",
   137: ""
+
+}
+
+const openseaURL: { [chainId: number]: string } = {
+  80001: "https://testnets.opensea.io",
+  137: "https://opensea.io"
 
 }
 
@@ -90,7 +96,7 @@ function App() {
   const democracyToken = useDemocracyToken();
   const [tokenSupply, setTokenSupply] = useState<string>("");
   const [nftSupply, setNftSupply] = useState<string>("");
-
+  const [balance, setBalance] = useState(0);
   useEffect(() => {
     if (mintSuccess) {
       const timer = setTimeout(() => setMintSuccess(false), 20000);
@@ -115,10 +121,13 @@ function App() {
           setFeePayer(new Wallet(FEE_PAYER_KEY, referendumContract.provider));
         }
         setNftSupply((await referendumContract.totalSupply()).toString());
+        if (account) {
+          setBalance((await referendumContract.balanceOf(account)).toNumber());
+        }
       }
     }
     fetchNftSupply();
-  }, [referendumContract]);
+  }, [referendumContract, account]);
 
   useEffect(() => {
     const fetchFeePayerBalance = async () => {
@@ -235,7 +244,7 @@ function App() {
         }
       })
   }
-
+  console.log(balance)
   return (
     <Layout style={{ backgroundColor: "#ffffff" }}>
       <Header style={{ ...styles.header, position: 'fixed', zIndex: 1, width: '100%' }}>
@@ -322,83 +331,111 @@ function App() {
                   boxShadow: (isTablet ? "0 1px 10px rgb(151 164 175 / 30%)" : ""),
                   border: (!isTablet ? "none" : "")
                 }}>
-                {mintStatus !== PageStatus.Finished ?
-                  <Spin spinning={mintStatus === PageStatus.Uploading} tip='鑄造中...'>
-                    <Form
-                      form={form}
-                      layout="vertical"
-                      size={'large'}
-                      onFinish={handleFinish}
-                    >
-                      <Form.Item name='name' label="名字" required tooltip="為您的專屬時刻起的名字吧" rules={[
-                        {
-                          required: true,
-                          message: '請輸入您的NFT的名字',
-                        },
-                      ]}>
-                        <Input placeholder="輸入NFT的名字..." />
-                      </Form.Item>
-                      <Form.Item name='description' label="你的心情" required tooltip="紀錄你當下的心情" rules={[
-                        {
-                          required: true,
-                          message: '請輸入一段話描述您的心情',
-                        },
-                      ]}>
-                        <Input placeholder="輸入NFT的描述..." />
-                      </Form.Item>
-                      <Form.Item name='image' label="你的時刻" required tooltip="上傳一張照片紀念這個時刻" rules={[
-                        {
-                          required: true,
-                          message: '請上傳一張照片',
-                        },
-                      ]}>
-                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                          <input type="file" id="actual-btn" hidden onChange={handleUploadChange} />
-                          <label htmlFor="actual-btn">{imageStatus !== ImageStatus.Uploaded ? uploadButton : <img src={previewURL} alt='preview' height='100%' width="100%" style={{ maxHeight: '200px', maxWidth: '200px' }} />}</label>
-                        </div>
-                      </Form.Item>
-                      <Form.Item name="gasfree" valuePropName="checked" >
-                        <Checkbox value={true}><Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>免Gas Fee鑄造<br />
-                          <span style={{ color: '#69c0ff', fontWeight: 500, fontSize: '12px' }}>GAS餘額: {feePayerBalance ? parseFloat(feePayerBalance).toFixed(2) : "0"} MATIC</span></Tooltip></Checkbox>
-                      </Form.Item>
-                      <div style={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
-                        <Button type="primary" htmlType="submit" style={{ borderRadius: '16px', width: '100%' }}>
-                          鑄造
-                        </Button>
-                      </div>
-                    </Form>
-                  </Spin> :
+                {balance && mintStatus === PageStatus.Edit ?
                   <div>
                     <Result
                       status="success"
                       title="你已經成功鑄造您的公投NFT!"
                       subTitle={<div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
-                        <Text>Token ID: #{tokenId?.toString()}</Text>
                         {chainId ?
-                          <Text>Transaction: <a href={`${BLOCKEXPLORER_URL[chainId]}/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`${BLOCKEXPLORER_URL[chainId]}/tx/${transactionHash}`)}</a></Text> :
-                          <Text>Transaction: <a href={`https://polygonscan.com/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://polygonscan.com/tx/${transactionHash}`)}</a></Text>
-                        }
-                        <Text>IPFS URL: <a href={`https://ipfs.io/ipfs/${metadataCID}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://ipfs.io/ipfs/${metadataCID}`)}</a></Text>
-                        {chainId ?
-                          <Text>Opeasea: <a href={`${openseaURL[chainId]}`} target="_blank" rel="noreferrer">{getEllipsisTxt(`${openseaURL[chainId]}`)}</a></Text> : <></>}
+                          <Text>上Opeasea查看: <a href={`${openseaURL[chainId]}/account`} target="_blank" rel="noreferrer">{`${openseaURL[chainId]}/account`}</a></Text> : <></>}
                       </div>}
                       extra={[
                         <FacebookShareButton
                           url={"https://www.referendum-nft.com/"}
-                          quote={`我已成功鑄造公投NFT(Referendum NFT) #${tokenId?.toString()}`}
+                          quote={`我已成功鑄造公投NFT(Referendum NFT)`}
                           hashtag={"#iVoted"}
                         >
                           <FacebookFilled style={{ color: '#4267B2' }} /> 分享到Facebook
                         </FacebookShareButton>,
                         <TwitterShareButton
                           url={"https://www.referendum-nft.com/"}
-                          title={`我已成功鑄造公投NFT(Referendum NFT) #${tokenId?.toString()}`}
+                          title={`我已成功鑄造公投NFT(Referendum NFT)`}
                           hashtags={["VoteForNFT", "DemocracyToken", "iVoted"]}>
                           <TwitterSquareFilled style={{ color: '#00acee' }} /> 分享到Twitter
                         </TwitterShareButton>,
                       ]}
                     />
-                  </div>
+                  </div> :
+
+                  (mintStatus !== PageStatus.Finished ?
+                    <Spin spinning={mintStatus === PageStatus.Uploading} tip='鑄造中...'>
+                      <Form
+                        form={form}
+                        layout="vertical"
+                        size={'large'}
+                        onFinish={handleFinish}
+                      >
+                        <Form.Item name='name' label="名字" required tooltip="為您的專屬時刻起的名字吧" rules={[
+                          {
+                            required: true,
+                            message: '請輸入您的NFT的名字',
+                          },
+                        ]}>
+                          <Input placeholder="輸入NFT的名字..." />
+                        </Form.Item>
+                        <Form.Item name='description' label="你的心情" required tooltip="紀錄你當下的心情" rules={[
+                          {
+                            required: true,
+                            message: '請輸入一段話描述您的心情',
+                          },
+                        ]}>
+                          <Input placeholder="輸入NFT的描述..." />
+                        </Form.Item>
+                        <Form.Item name='image' label="你的時刻" required tooltip="上傳一張照片紀念這個時刻" rules={[
+                          {
+                            required: true,
+                            message: '請上傳一張照片',
+                          },
+                        ]}>
+                          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <input type="file" id="actual-btn" hidden onChange={handleUploadChange} />
+                            <label htmlFor="actual-btn">{imageStatus !== ImageStatus.Uploaded ? uploadButton : <img src={previewURL} alt='preview' height='100%' width="100%" style={{ maxHeight: '200px', maxWidth: '200px' }} />}</label>
+                          </div>
+                        </Form.Item>
+                        <Form.Item name="gasfree" valuePropName="checked" >
+                          <Checkbox value={true}><Tooltip title='支付gas fee的使用者將會多拿到一顆的民主精神代幣'>免Gas Fee鑄造<br />
+                            <span style={{ color: '#69c0ff', fontWeight: 500, fontSize: '12px' }}>GAS餘額: {feePayerBalance ? parseFloat(feePayerBalance).toFixed(2) : "0"} MATIC</span></Tooltip></Checkbox>
+                        </Form.Item>
+                        <div style={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
+                          <Button type="primary" htmlType="submit" style={{ borderRadius: '16px', width: '100%' }}>
+                            鑄造
+                          </Button>
+                        </div>
+                      </Form>
+                    </Spin> :
+                    <div>
+                      <Result
+                        status="success"
+                        title="你已經成功鑄造您的公投NFT!"
+                        subTitle={<div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
+                          <Text>Token ID: #{tokenId?.toString()}</Text>
+                          {chainId ?
+                            <Text>Transaction: <a href={`${BLOCKEXPLORER_URL[chainId]}/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`${BLOCKEXPLORER_URL[chainId]}/tx/${transactionHash}`)}</a></Text> :
+                            <Text>Transaction: <a href={`https://polygonscan.com/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://polygonscan.com/tx/${transactionHash}`)}</a></Text>
+                          }
+                          <Text>IPFS URL: <a href={`https://ipfs.io/ipfs/${metadataCID}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://ipfs.io/ipfs/${metadataCID}`)}</a></Text>
+                          {chainId ?
+                            <Text>Opeasea: <a href={`${openseaCollectionURL[chainId]}`} target="_blank" rel="noreferrer">{getEllipsisTxt(`${openseaCollectionURL[chainId]}`)}</a></Text> : <></>}
+                        </div>}
+                        extra={[
+                          <FacebookShareButton
+                            url={"https://www.referendum-nft.com/"}
+                            quote={`我已成功鑄造公投NFT(Referendum NFT) #${tokenId?.toString()}`}
+                            hashtag={"#iVoted"}
+                          >
+                            <FacebookFilled style={{ color: '#4267B2' }} /> 分享到Facebook
+                          </FacebookShareButton>,
+                          <TwitterShareButton
+                            url={"https://www.referendum-nft.com/"}
+                            title={`我已成功鑄造公投NFT(Referendum NFT) #${tokenId?.toString()}`}
+                            hashtags={["VoteForNFT", "DemocracyToken", "iVoted"]}>
+                            <TwitterSquareFilled style={{ color: '#00acee' }} /> 分享到Twitter
+                          </TwitterShareButton>,
+                        ]}
+                      />
+                    </div>
+                  )
                 }
               </Card>
             </div >
