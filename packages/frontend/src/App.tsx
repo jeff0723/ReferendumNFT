@@ -1,23 +1,23 @@
-import { LoadingOutlined, PlusOutlined, MenuOutlined, FacebookFilled, TwitterSquareFilled } from '@ant-design/icons';
-import { Card, Form, Input, Layout, Typography, Button, Checkbox, Tooltip, Col, Row, Divider, Drawer, Spin, Result } from 'antd';
+import { ArrowDownOutlined, FacebookFilled, LoadingOutlined, MenuOutlined, PlusOutlined, TwitterSquareFilled } from '@ant-design/icons';
+import { useWindowSize } from '@react-hook/window-size';
+import { Button, Card, Checkbox, Col, Divider, Drawer, Form, Input, Layout, Result, Row, Spin, Tooltip, Typography } from 'antd';
 import "antd/dist/antd.css";
+import { BigNumber, ContractReceipt, ethers, Wallet } from 'ethers';
 import { create } from 'ipfs-http-client';
 import React, { useEffect, useState } from 'react';
+import Confetti from 'react-confetti';
+import { useMediaQuery } from 'react-responsive';
+import { FacebookShareButton, TwitterShareButton } from "react-share";
 import Account from './components/Account';
 import Chains from './components/Chains';
+import { REFERENDUM_NFT_ADDRESS } from './constants/address';
+import { BLOCKEXPLORER_URL } from './constants/blockExplorer';
+import { getEllipsisTxt } from './helpers/formatters';
+import { openNotificationWithIcon } from './helpers/notification';
+import { useDemocracyToken, useReferendumContract } from './hooks/useContract';
 import { useActiveWeb3React } from './hooks/web3';
-import { useMediaQuery } from 'react-responsive'
-import { useDemocracyToken, useReferendumContract } from './hooks/useContract'
-import metadataTemplate from './metadata-template.json'
-import { FacebookShareButton, TwitterShareButton } from "react-share";
+import metadataTemplate from './metadata-template.json';
 import "./style.css";
-import { BigNumber, ContractReceipt, ethers, Wallet } from 'ethers';
-import { openNotificationWithIcon } from './helpers/notification'
-import { BLOCKEXPLORER_URL } from './constants/blockExplorer'
-import { getEllipsisTxt } from './helpers/formatters'
-import { REFERENDUM_NFT_ADDRESS } from './constants/address'
-import Confetti from 'react-confetti';
-import { useWindowSize } from '@react-hook/window-size';
 
 enum ImageStatus {
   NotUpload,
@@ -292,6 +292,13 @@ function App() {
                 <span style={{ marginLeft: "16px", backgroundColor: "#e6f7ff", color: '#40a9ff', padding: '5px', borderRadius: '8px', fontWeight: 500 }}>{`民主代幣發行量: ${tokenSupply ? parseInt(tokenSupply).toFixed(2) : 0}`} </span>
 
               </div>
+              {!isTablet ?
+                <div style={{ marginTop: "32px" }}>
+                  <a href="#mint">
+                    <ArrowDownOutlined style={{ fontSize: '16px', color: '#bfbfbf' }} />
+                  </a>
+                </div> : <></>
+              }
             </div>
           </Col>
           {!isTablet ? <Divider /> : <></>}
@@ -302,7 +309,7 @@ function App() {
                 width={width}
                 height={height}
               /> : <></>}
-            <div style={{ padding: '16px', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 48px)' }}>
+            <div id='mint' style={{ padding: '16px', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 48px)' }}>
               <Card
                 style={{
                   borderRadius: '16px',
