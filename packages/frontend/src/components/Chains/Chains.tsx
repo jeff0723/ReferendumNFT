@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { PolygonLogo } from "./Logos";
 import { Menu, Dropdown, Button } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import useChain from "../../hooks/useChain";
+import { switchNetwork } from "../../hooks/useChain";
 import { useActiveWeb3React } from '../../hooks/web3'
-import { useMediaQuery } from 'react-responsive'
+import { useMediaQuery } from 'react-responsive';
+import { BigNumber, ethers } from "ethers";
 
 interface Props {
 
@@ -49,14 +50,14 @@ const menuItems = [
 ];
 const Chains = (props: Props) => {
     const { chainId, library } = useActiveWeb3React()
-    const { switchNetwork } = useChain();
     const [selected, setSelected] = useState<Chain>();
     const isTablet = useMediaQuery({
         query: '(min-width: 992px)'
     })
     const handleMenuClick = (e: any) => {
-        console.log("switch to: ", e.key);
-        switchNetwork(e.key);
+        const chainId = BigNumber.from(e.key).toNumber();
+        console.log("switch to: ", typeof chainId, chainId);
+        if (library) switchNetwork(library, chainId);
     };
     useEffect(() => {
         const getChainId = () => {
@@ -83,7 +84,7 @@ const Chains = (props: Props) => {
         <div>
             <Dropdown overlay={menu} trigger={["click"]}>
                 <Button
-                    key={selected?.key}
+                    key={selected?.id}
                     icon={selected?.icon}
                     style={{ ...styles.button, ...styles.item, border: (isTablet ? "none" : "") }}
                 >

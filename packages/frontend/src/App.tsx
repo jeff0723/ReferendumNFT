@@ -108,7 +108,7 @@ function App() {
     }
     fetchTokenSupply();
   }, [democracyToken]);
-  console.log(tokenSupply)
+  console.log("DOM supply:", tokenSupply)
   const isDesktop = useMediaQuery({
     query: '(min-width: 576px)'
   })
@@ -186,7 +186,7 @@ function App() {
             handleReceipt(await tx.wait());
           }
         } catch (err: any) {
-          console.log(typeof err.code)
+          console.log("err code type:", typeof err.code)
           if (err.code === 4001) {
             openNotificationWithIcon("error", "交易錯誤", "您已拒絕了交易")
           }
