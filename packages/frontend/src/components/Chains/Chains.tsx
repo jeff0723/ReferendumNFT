@@ -40,13 +40,7 @@ const menuItems = [
         key: "0x89",
         value: "Polygon",
         icon: <PolygonLogo />,
-    },
-    {
-        id: 80001,
-        key: "0x13881",
-        value: "Mumbai",
-        icon: <PolygonLogo />,
-    },
+    }
 ];
 const Chains = (props: Props) => {
     const { chainId, library } = useActiveWeb3React()

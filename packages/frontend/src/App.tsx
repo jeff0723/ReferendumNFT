@@ -11,7 +11,6 @@ import { FacebookShareButton, TwitterShareButton } from "react-share";
 import Account from './components/Account';
 import Chains from './components/Chains';
 import { REFERENDUM_NFT_ADDRESS } from './constants/address';
-import { BLOCKEXPLORER_URL } from './constants/blockExplorer';
 import { getEllipsisTxt } from './helpers/formatters';
 import { openNotificationWithIcon } from './helpers/notification';
 import { useDemocracyToken, useReferendumContract } from './hooks/useContract';
@@ -32,7 +31,6 @@ enum PageStatus {
   Error
 }
 const FEE_PAYER_KEY = process.env.REACT_APP_FEE_PAYER;
-// const FEE_PAYER_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography
 const styles = {
@@ -42,7 +40,6 @@ const styles = {
     alignItems: 'center',
     background: "linear-gradient(270deg, #b5f5ec 10%, #87e8de 50%, #91d5ff 70%,#40a9ff 100% )",
     color: '#ffffff',
-    // border: "1px solid #e7eaf3"
   },
   contentBox: {
     display: 'flex',
@@ -58,17 +55,6 @@ const styles = {
   subtitle: {
     color: '#bfbfbf'
   }
-}
-const openseaCollectionURL: { [chainId: number]: string } = {
-  80001: "https://testnets.opensea.io/collection/referendum",
-  137: ""
-
-}
-
-const openseaURL: { [chainId: number]: string } = {
-  80001: "https://testnets.opensea.io",
-  137: "https://opensea.io"
-
 }
 
 const addImageOptions = {
@@ -105,10 +91,6 @@ function App() {
   }, [mintSuccess])
   useEffect(() => {
     if (!chainId) return;
-    if (chainId === 80001) {
-      openNotificationWithIcon('info', '使用測試網路', '您正在使用Mumbai測試網')
-      return;
-    }
     if (chainId !== 137) {
       openNotificationWithIcon('info', '未使用Polygon網路', '請點擊Menu以切換網路至Polygon')
       return;
@@ -193,11 +175,19 @@ function App() {
   }
 
   const handleFinish = async (values: any) => {
+    if (Date.now() < 1639785600000) {
+      openNotificationWithIcon('info', '活動尚未開始', '公投NFT將會於2021/12/18 08:00AM 開放鑄造')
+      return;
+    }
+    if (Date.now() > 1639929600000) {
+      openNotificationWithIcon('info', '活動已經結束', '很高興你們的參與本次公投NFT圓滿落幕')
+      return;
+    }
     if (!chainId) {
       openNotificationWithIcon('warning', '尚未連接錢包', '請點擊Menu以連結錢包')
       return;
     }
-    if (chainId !== 80001 && chainId !== 137) {
+    if (chainId !== 137) {
       openNotificationWithIcon('info', '未使用Polygon網路', '請點擊Menu以切換網路至Polygon')
       return;
     }
@@ -244,7 +234,6 @@ function App() {
         }
       })
   }
-  console.log(balance)
   return (
     <Layout style={{ backgroundColor: "#ffffff" }}>
       <Header style={{ ...styles.header, position: 'fixed', zIndex: 1, width: '100%' }}>
@@ -338,7 +327,7 @@ function App() {
                       title="你已經成功鑄造您的公投NFT!"
                       subTitle={<div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
                         {chainId ?
-                          <Text>上Opeasea查看: <a href={`${openseaURL[chainId]}/account`} target="_blank" rel="noreferrer">{`${openseaURL[chainId]}/account`}</a></Text> : <></>}
+                          <Text>上Opeasea查看: <a href={`https://opensea.io/account`} target="_blank" rel="noreferrer">{`https://opensea.io/account`}</a></Text> : <></>}
                       </div>}
                       extra={[
                         <FacebookShareButton
@@ -410,13 +399,9 @@ function App() {
                         title="你已經成功鑄造您的公投NFT!"
                         subTitle={<div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
                           <Text>Token ID: #{tokenId?.toString()}</Text>
-                          {chainId ?
-                            <Text>Transaction: <a href={`${BLOCKEXPLORER_URL[chainId]}/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`${BLOCKEXPLORER_URL[chainId]}/tx/${transactionHash}`)}</a></Text> :
-                            <Text>Transaction: <a href={`https://polygonscan.com/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://polygonscan.com/tx/${transactionHash}`)}</a></Text>
-                          }
+                          <Text>Transaction: <a href={`https://polygonscan.com/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://polygonscan.com/tx/${transactionHash}`)}</a></Text>
                           <Text>IPFS URL: <a href={`https://ipfs.io/ipfs/${metadataCID}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://ipfs.io/ipfs/${metadataCID}`)}</a></Text>
-                          {chainId ?
-                            <Text>Opeasea: <a href={`${openseaCollectionURL[chainId]}`} target="_blank" rel="noreferrer">{getEllipsisTxt(`${openseaCollectionURL[chainId]}`)}</a></Text> : <></>}
+                          <Text>Opeasea: <a href={`https://opensea.io/account`} target="_blank" rel="noreferrer">{getEllipsisTxt(`https://opensea.io/account`)}</a></Text>
                         </div>}
                         extra={[
                           <FacebookShareButton
@@ -447,7 +432,7 @@ function App() {
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {
             chainId ?
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Donation:  <a href={`${BLOCKEXPLORER_URL[chainId]}/address/${REFERENDUM_NFT_ADDRESS[chainId]}`} target="_blank" rel="noreferrer">{getEllipsisTxt(REFERENDUM_NFT_ADDRESS[chainId])}</a></div>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Donation:  <a href={`https://polygonscan.com/address/0x9eE18F9745f60e1d2036486691fCA5F5f64b7Dda`} target="_blank" rel="noreferrer">{getEllipsisTxt(REFERENDUM_NFT_ADDRESS[chainId])}</a></div>
               :
               <></>
           }
