@@ -56,6 +56,11 @@ const styles = {
     color: '#bfbfbf'
   }
 }
+const openseaURL: { [chainId: number]: string } = {
+  80001: "https://testnets.opensea.io/collection/referendum",
+  137: ""
+
+}
 
 const addImageOptions = {
   pin: true,
@@ -87,6 +92,7 @@ function App() {
       return;
     }
     if (chainId !== 137) {
+      console.log("Not polygon")
       openNotificationWithIcon('info', '未使用Polygon網路', '請點擊Menu以切換網路至Polygon')
       return;
     }
@@ -343,7 +349,10 @@ function App() {
                           <Text>Transaction: <a href={`${BLOCKEXPLORER_URL[chainId]}/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`${BLOCKEXPLORER_URL[chainId]}/tx/${transactionHash}`)}</a></Text> :
                           <Text>Transaction: <a href={`https://polygonscan.com/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://polygonscan.com/tx/${transactionHash}`)}</a></Text>
                         }
-                        <Text>IPFS URL: <a href={`https://ipfs.io/ipfs/${metadataCID}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://ipfs.io/ipfs/${metadataCID}`)}</a></Text></div>}
+                        <Text>IPFS URL: <a href={`https://ipfs.io/ipfs/${metadataCID}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://ipfs.io/ipfs/${metadataCID}`)}</a></Text>
+                        {chainId ?
+                          <Text>Opeasea: <a href={`${openseaURL[chainId]}`} target="_blank" rel="noreferrer">{getEllipsisTxt(`${openseaURL[chainId]}`)}</a></Text> : <></>}
+                      </div>}
                       extra={[
                         <FacebookShareButton
                           url={"https://www.referendum-nft.com/"}
