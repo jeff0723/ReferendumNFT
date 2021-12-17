@@ -337,7 +337,7 @@ function App() {
                           message: '請輸入您的NFT的名字',
                         },
                       ]}>
-                        <Input placeholder="名字..." />
+                        <Input placeholder="輸入NFT的名字..." />
                       </Form.Item>
                       <Form.Item name='description' label="你的心情" required tooltip="紀錄你當下的心情" rules={[
                         {
@@ -345,7 +345,7 @@ function App() {
                           message: '請輸入一段話描述您的心情',
                         },
                       ]}>
-                        <Input placeholder="描述..." />
+                        <Input placeholder="輸入NFT的描述..." />
                       </Form.Item>
                       <Form.Item name='image' label="你的時刻" required tooltip="上傳一張照片紀念這個時刻" rules={[
                         {
