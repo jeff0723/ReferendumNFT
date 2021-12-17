@@ -16,6 +16,9 @@ import { openNotificationWithIcon } from './helpers/notification'
 import { BLOCKEXPLORER_URL } from './constants/blockExplorer'
 import { getEllipsisTxt } from './helpers/formatters'
 import { REFERENDUM_NFT_ADDRESS } from './constants/address'
+import Confetti from 'react-confetti';
+import { useWindowSize } from '@react-hook/window-size';
+
 enum ImageStatus {
   NotUpload,
   Uploading,
@@ -69,6 +72,8 @@ const addImageOptions = {
 const client = create({ url: 'https://ipfs.infura.io:5001/api/v0' })
 
 function App() {
+  const [width, height] = useWindowSize()
+  const [mintSuccess, setMintSuccess] = useState(false);
   const { account, chainId } = useActiveWeb3React();
   const [form] = Form.useForm();
   const [imageURI, setImageURI] = useState<string>("");
@@ -85,6 +90,13 @@ function App() {
   const democracyToken = useDemocracyToken();
   const [tokenSupply, setTokenSupply] = useState<string>("");
   const [nftSupply, setNftSupply] = useState<string>("");
+
+  useEffect(() => {
+    if (mintSuccess) {
+      const timer = setTimeout(() => setMintSuccess(false), 20000);
+      return () => clearTimeout(timer);
+    }
+  }, [mintSuccess])
   useEffect(() => {
     if (!chainId) return;
     if (chainId === 80001) {
@@ -162,6 +174,7 @@ function App() {
         setTokenId(tokenId);
       }
       setMintStatus(PageStatus.Finished);
+      setMintSuccess(true);
       if (referendumContract) {
         setNftSupply((await referendumContract.totalSupply()).toString());
       }
@@ -281,8 +294,14 @@ function App() {
               </div>
             </div>
           </Col>
-          {!isTablet ? <Divider style={{ marginBottom: '32px' }} /> : <></>}
+          {!isTablet ? <Divider /> : <></>}
+
           <Col span={24} lg={12}>
+            {mintStatus ?
+              <Confetti
+                width={width}
+                height={height}
+              /> : <></>}
             <div style={{ padding: '16px', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 48px)' }}>
               <Card
                 style={{
