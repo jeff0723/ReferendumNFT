@@ -297,7 +297,7 @@ function App() {
           {!isTablet ? <Divider /> : <></>}
 
           <Col span={24} lg={12}>
-            {mintStatus ?
+            {mintSuccess ?
               <Confetti
                 width={width}
                 height={height}
