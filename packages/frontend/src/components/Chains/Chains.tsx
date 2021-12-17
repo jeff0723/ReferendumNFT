@@ -6,6 +6,7 @@ import { switchNetwork } from "../../hooks/useChain";
 import { useActiveWeb3React } from '../../hooks/web3'
 import { useMediaQuery } from 'react-responsive';
 import { BigNumber } from "ethers";
+import { openNotificationWithIcon } from '../../helpers/notification';
 
 interface Props {
 
@@ -51,6 +52,7 @@ const Chains = (props: Props) => {
     const handleMenuClick = (e: any) => {
         const chainId = BigNumber.from(e.key).toNumber();
         if (library) switchNetwork(library, chainId);
+        else openNotificationWithIcon("warning", "尚未連接錢包", "請先連接錢包再切換網路");
     };
     useEffect(() => {
         const getChainId = () => {

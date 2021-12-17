@@ -31,8 +31,8 @@ export async function addNetwork(library: Web3Provider, chainId: number): Promis
           ],
         })
     } catch (error: any) {
-    alert(error.message);
-}
+      console.log(error)
+    }
 }
 
 export async function switchNetwork(library: Web3Provider, chainId: number) {
