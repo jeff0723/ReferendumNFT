@@ -294,9 +294,13 @@ function App() {
               </div>
               {!isTablet ?
                 <div style={{ marginTop: "32px" }}>
-                  <a href="#mint">
+                  <div onClick={() => {
+                    document?.getElementById("mint")?.scrollIntoView({
+                      behavior: 'smooth'
+                    });
+                  }}>
                     <ArrowDownOutlined style={{ fontSize: '16px', color: '#bfbfbf' }} />
-                  </a>
+                  </div>
                 </div> : <></>
               }
             </div>
