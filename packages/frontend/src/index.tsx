@@ -8,12 +8,7 @@ import { Web3ReactProvider, createWeb3ReactRoot } from '@web3-react/core';
 import Web3ReactManager from './components/Web3ReactManager'
 function getLibrary(provider: any): Web3Provider {
   const library = new Web3Provider(
-    provider,
-    typeof provider.chainId === 'number'
-      ? provider.chainId
-      : typeof provider.chainId === 'string'
-        ? parseInt(provider.chainId)
-        : 'any'
+    provider
   )
   library.pollingInterval = 15_000
   library.detectNetwork().then(network => console.log("detected network:", network))
