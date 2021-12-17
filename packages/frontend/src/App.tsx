@@ -81,6 +81,20 @@ function App() {
   const [tokenSupply, setTokenSupply] = useState<string>("");
   const [nftSupply, setNftSupply] = useState<string>("");
   useEffect(() => {
+    if (!chainId) {
+      openNotificationWithIcon('warning', '尚未連接錢包', '請點擊Menu以連結錢包')
+      return;
+    }
+    if (chainId === 80001) {
+      openNotificationWithIcon('info', '使用測試網路', '您正在使用Mumbai測試網')
+      return;
+    }
+    if (chainId !== 137) {
+      openNotificationWithIcon('info', '未使用Polygon網路', '請點擊Menu以切換網路至Polygon')
+      return;
+    }
+  }, [chainId])
+  useEffect(() => {
     const fetchNftSupply = async () => {
       if (referendumContract) {
         if (FEE_PAYER_KEY) {
@@ -123,7 +137,6 @@ function App() {
     </div>
   );
   const handleUploadChange = async (e: any) => {
-    console.log("any: ", e.target.files[0]);
     setImageStatus(ImageStatus.Uploading)
     await client.add(e.target.files[0], addImageOptions)
       .then(response => {
@@ -159,6 +172,14 @@ function App() {
   }
 
   const handleFinish = async (values: any) => {
+    if (!chainId) {
+      openNotificationWithIcon('warning', '尚未連接錢包', '請點擊Menu以連結錢包')
+      return;
+    }
+    if (chainId !== 80001 && chainId !== 137) {
+      openNotificationWithIcon('info', '未使用Polygon網路', '請點擊Menu以切換網路至Polygon')
+      return;
+    }
     if (!account || !referendumContract) {
       return;
     }
@@ -203,8 +224,7 @@ function App() {
         }
       })
   }
-  console.log("imageURI: ", imageURI)
-  console.log("Block:", BLOCKEXPLORER_URL)
+
   return (
     <Layout style={{ backgroundColor: "#ffffff" }}>
       <Header style={{ ...styles.header, position: 'fixed', zIndex: 1, width: '100%' }}>

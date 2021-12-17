@@ -1,5 +1,4 @@
 import { notification } from "antd";
-
 export const openNotificationWithIcon = (type: string, message: string, description: string) => {
     switch (type) {
         case "warning":
@@ -16,6 +15,12 @@ export const openNotificationWithIcon = (type: string, message: string, descript
             break;
         case "error":
             notification['error']({
+                message: message,
+                description: description,
+            });
+            break;
+        case "info":
+            notification['info']({
                 message: message,
                 description: description,
             });

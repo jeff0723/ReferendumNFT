@@ -11,7 +11,6 @@ const useChain = () => {
             params: [{ chainId: chain}],
           });
       } catch (error) {
-        if (error.code === 4902) {
           try {
             const config = networkConfigs[chain];
             const { chainName, currencyName, currencySymbol, rpcUrl, blockExplorerUrl } =
@@ -35,7 +34,6 @@ const useChain = () => {
             } catch (error) {
             alert(error.message);
           }
-        }
       }
     } else {
       openNotificationWithIcon("warning","尚未連接錢包","請先連接錢包再切換網路")

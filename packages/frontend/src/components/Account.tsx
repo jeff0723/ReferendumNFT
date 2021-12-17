@@ -7,7 +7,7 @@ import WalletConnectIcon from '../images/walletConnectIcon.svg';
 import { useActiveWeb3React } from '../hooks/web3';
 import { getEllipsisTxt } from '../helpers/formatters'
 import { useMediaQuery } from 'react-responsive'
-
+import { isMobile } from '../utils/userAgent'
 declare let window: any;
 
 interface Props {
@@ -86,14 +86,24 @@ const Account = (props: Props) => {
                             </div>
                         </Box>
                         :
-                        <a href="https://metamask.io" target="_blank" rel="noreferrer">
-                            <Box>
-                                <Text>安裝Metamask</Text>
-                                <div style={styles.iconWrapper}>
-                                    <img src={MetaMaskIcon} alt="Icon" height="24px" width="24px" />
-                                </div>
-                            </Box>
-                        </a>
+                        (isMobile ?
+                            <a href="https://metamask.app.link/dapp/www.referendum-nft.com" target="_blank" rel="noreferrer">
+                                <Box>
+                                    <Text>安裝/開啟Metamask</Text>
+                                    <div style={styles.iconWrapper}>
+                                        <img src={MetaMaskIcon} alt="Icon" height="24px" width="24px" />
+                                    </div>
+                                </Box>
+                            </a> :
+                            <a href="https://metamask.io" target="_blank" rel="noreferrer">
+                                <Box>
+                                    <Text>安裝Metamask</Text>
+                                    <div style={styles.iconWrapper}>
+                                        <img src={MetaMaskIcon} alt="Icon" height="24px" width="24px" />
+                                    </div>
+                                </Box>
+                            </a>
+                        )
                 }
                 <Box onClick={() => {
                     activate(walletconnect, undefined, true)
