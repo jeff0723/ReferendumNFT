@@ -81,7 +81,7 @@ function App() {
   const [tokenSupply, setTokenSupply] = useState<string>("");
   const [nftSupply, setNftSupply] = useState<string>("");
   useEffect(() => {
-
+    if (!chainId) return;
     if (chainId === 80001) {
       openNotificationWithIcon('info', '使用測試網路', '您正在使用Mumbai測試網')
       return;
