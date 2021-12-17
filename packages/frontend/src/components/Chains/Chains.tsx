@@ -76,8 +76,6 @@ const Chains = (props: Props) => {
             ))}
         </Menu>
     );
-    // console.log("ChainID: ", chainId)
-    // console.log("library: ", library)
 
     return (
         <div>

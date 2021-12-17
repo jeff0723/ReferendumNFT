@@ -104,7 +104,6 @@ function App() {
       return;
     }
     if (chainId !== 137) {
-      console.log("Not polygon")
       openNotificationWithIcon('info', '未使用Polygon網路', '請點擊Menu以切換網路至Polygon')
       return;
     }
