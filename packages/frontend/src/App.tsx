@@ -327,7 +327,7 @@ function App() {
                       title="你已經成功鑄造您的公投NFT!"
                       subTitle={<div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
                         {chainId ?
-                          <Text>上Opeasea查看: <a href={`https://opensea.io/account`} target="_blank" rel="noreferrer">{`https://opensea.io/account`}</a></Text> : <></>}
+                          <Text>上Opeasea查看: <a href={`https://opensea.io/collection/referendum-v2`} target="_blank" rel="noreferrer">{`https://opensea.io/account`}</a></Text> : <></>}
                       </div>}
                       extra={[
                         <FacebookShareButton
@@ -401,7 +401,7 @@ function App() {
                           <Text>Token ID: #{tokenId?.toString()}</Text>
                           <Text>Transaction: <a href={`https://polygonscan.com/tx/${transactionHash}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://polygonscan.com/tx/${transactionHash}`)}</a></Text>
                           <Text>IPFS URL: <a href={`https://ipfs.io/ipfs/${metadataCID}`} target="_blank" rel="noreferrer"> {getEllipsisTxt(`https://ipfs.io/ipfs/${metadataCID}`)}</a></Text>
-                          <Text>Opeasea: <a href={`https://opensea.io/account`} target="_blank" rel="noreferrer">{getEllipsisTxt(`https://opensea.io/account`)}</a></Text>
+                          <Text>Opeasea: <a href={`https://opensea.io/collection/referendum-v2`} target="_blank" rel="noreferrer">{getEllipsisTxt(`https://opensea.io/collection/referendum-v2`)}</a></Text>
                         </div>}
                         extra={[
                           <FacebookShareButton
