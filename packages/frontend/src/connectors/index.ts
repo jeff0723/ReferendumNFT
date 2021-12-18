@@ -17,6 +17,7 @@ export enum SupportedChainId {
     MUMBAI = 80001,
     POLYGON = 137,
     HARDHAT = 1337,
+    BSC = 56,
   }
   export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
     SupportedChainId.MAINNET,
@@ -32,7 +33,7 @@ export enum SupportedChainId {
     SupportedChainId.MUMBAI,
     SupportedChainId.POLYGON,
     SupportedChainId.HARDHAT,
-    
+    SupportedChainId.BSC
   ]
 const NETWORK_URLS: { [key in SupportedChainId]: string } = {
     [SupportedChainId.MAINNET]: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
@@ -47,6 +48,7 @@ const NETWORK_URLS: { [key in SupportedChainId]: string } = {
     [SupportedChainId.MUMBAI]: "https://polygon-mumbai.g.alchemy.com/v2/YeWNsmNZnmrXElTepCA6Js4GG7bt366I",
     [SupportedChainId.POLYGON]: "https://polygon-mainnet.g.alchemy.com/v2/Lryl_V_CrzMOEQFwr9E6ADuLta8DB3ix",
     [SupportedChainId.HARDHAT]: "http://127.0.0.1:8545",
+    [SupportedChainId.BSC]: "https://bsc-dataseed.binance.org/",
 }
 
 export const injected = new InjectedConnector({
