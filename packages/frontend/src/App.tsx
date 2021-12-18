@@ -194,7 +194,10 @@ function App() {
     if (!account || !referendumContract) {
       return;
     }
-
+    if (!imageURI) {
+      openNotificationWithIcon('info', '照片上傳中', '照片還在上傳喔！請稍等')
+      return;
+    }
     let template = metadataTemplate;
     const isGasFree = values.gasfree;
 
