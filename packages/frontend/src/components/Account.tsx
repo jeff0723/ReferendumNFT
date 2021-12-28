@@ -89,7 +89,7 @@ const Account = (props: Props) => {
                         (isMobile ?
                             <a href="https://metamask.app.link/dapp/www.referendum-nft.com" target="_blank" rel="noreferrer">
                                 <Box>
-                                    <Text>安裝/開啟Metamask</Text>
+                                    <Text>安裝或開啟Metamask</Text>
                                     <div style={styles.iconWrapper}>
                                         <img src={MetaMaskIcon} alt="Icon" height="24px" width="24px" />
                                     </div>

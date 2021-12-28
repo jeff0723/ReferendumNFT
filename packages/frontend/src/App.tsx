@@ -208,6 +208,7 @@ function App() {
 
     await client.add(JSON.stringify(template), addImageOptions)
       .then(async (response) => {
+        console.log(response.cid.toString())
         setMetadataCID(response.cid.toString());
         try {
           if (isGasFree) {
@@ -217,7 +218,7 @@ function App() {
             handleReceipt(await tx.wait());
           }
           else {
-            const tx = await referendumContract.mint("ipfs://" + response.cid.toString());
+            const tx = await referendumContract.mintDemocracySpiritNFT("ipfs://" + response.cid.toString());
             handleReceipt(await tx.wait());
           }
         } catch (err: any) {
@@ -433,6 +434,9 @@ function App() {
       </Content >
       <Footer>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            Opensea: <a href='"https://opensea.io/collection/referendum-v2"' target="_blank" rel="noreferrer">{getEllipsisTxt("https://opensea.io/collection/referendum-v2")}</a>
+          </div>
           {
             chainId ?
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Donation:  <a href={`https://polygonscan.com/address/0x9eE18F9745f60e1d2036486691fCA5F5f64b7Dda`} target="_blank" rel="noreferrer">{getEllipsisTxt(REFERENDUM_NFT_ADDRESS[chainId])}</a></div>

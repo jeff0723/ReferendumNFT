@@ -46,5 +46,9 @@
     "deploy": "hardhat deploy",
     "etherscan-verify": "hardhat etherscan-verify",
     "coverage": "hardhat converage"
+  },
+  "dependencies": {
+    "node-fetch": "^3.1.0",
+    "request": "^2.88.2"
   }
 }
