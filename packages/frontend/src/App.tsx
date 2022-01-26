@@ -147,6 +147,7 @@ function App() {
         setImageStatus(ImageStatus.Uploaded)
         setPreviewURL(URL.createObjectURL(e.target.files[0]))
         setImageURI(`ipfs://${response.cid.toString()}`)
+        console.log(response.cid.toString())
       })
 
   }
